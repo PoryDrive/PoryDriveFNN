@@ -398,6 +398,30 @@ uint64_t microtime()
     return 1000000 * tv.tv_sec + tv.tv_usec;
 }
 
+int forceTrim(const char* file, const size_t trim)
+{
+    int f = open(file, O_WRONLY);
+    if(f > -1)
+    {
+        const size_t len = lseek(f, 0, SEEK_END);
+
+        uint c = 0;
+        while(ftruncate(f, len-trim) == -1)
+        {
+            close(f);
+            f = open(file, O_WRONLY);
+            c++;
+            if(c > 333)
+                return -2;
+        }
+
+        close(f);
+    }
+    else
+        return -1;
+    return 0;
+}
+
 //*************************************
 // render functions
 //*************************************
@@ -954,6 +978,7 @@ void main_loop()
         const f32 dist = vDist(pp, zp);
 
         // input
+        int eskip = 0;
         FILE* f = fopen("dataset_x.dat", "ab"); // append bytes
         if(f != NULL)
         {
@@ -966,25 +991,49 @@ void main_loop()
             r += fwrite(&dist,  1, sizeof(f32), f);
             if(r != 24)
             {
-                printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes) Logging disabled.\n", r);
-                dataset_logger = 0;
+                printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes).\n", r);
+                if(forceTrim("dataset_x.dat", r) < 0)
+                {
+                    printf("Failed to repair X file. Exiting.\n");
+                    rename("dataset_x.dat", "dataset_x.dat_dirty");
+                    exit(0);
+                }
+                printf("Repaired.\n");
+                eskip = 1;
             }
             fclose(f);
         }
 
         // targets
-        f = fopen("dataset_y.dat", "ab"); // append bytes
-        if(f != NULL)
+        if(eskip == 0)
         {
-            size_t r = 0;
-            r += fwrite(&sr,  1, sizeof(f32), f);
-            r += fwrite(&sp,  1, sizeof(f32), f);
-            if(r != 8)
+            f = fopen("dataset_y.dat", "ab"); // append bytes
+            if(f != NULL)
             {
-                printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes) Logging disabled.\n", r);
-                dataset_logger = 0;
+                size_t r = 0;
+                r += fwrite(&sr,  1, sizeof(f32), f);
+                r += fwrite(&sp,  1, sizeof(f32), f);
+                if(r != 8)
+                {
+                    printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
+                    if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that too
+                    {
+                        printf("Failed to repair X file. Exiting.\n");
+                        rename("dataset_x.dat", "dataset_x.dat_dirty");
+                        rename("dataset_y.dat", "dataset_y.dat_dirty");
+                        exit(0);
+                    }
+                    if(forceTrim("dataset_y.dat", r) < 0)
+                    {
+                        printf("Failed to repair Y file. Exiting.\n");
+                        rename("dataset_x.dat", "dataset_x.dat_dirty");
+                        rename("dataset_y.dat", "dataset_y.dat_dirty");
+                        exit(0);
+                    }
+                    printf("Repaired.\n");
+                }
+                fclose(f);
             }
-            fclose(f);
         }
 
         // increment counter
