@@ -562,9 +562,9 @@ void rCube(f32 x, f32 y)
             colliding = x*y+x;
             cc++;
 
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] Collisions: %u\n", strts, cc);
+            // char strts[16];
+            // timestamp(&strts[0]);
+            // printf("[%s] Collisions: %u\n", strts, cc);
         }
     }
     else if(x*y+x == colliding)
