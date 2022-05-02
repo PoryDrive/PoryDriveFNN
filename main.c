@@ -1438,7 +1438,7 @@ int main(int argc, char** argv)
 
     // trigger special mode
     if(argc == 3)
-        winw = 420, winh = 240;
+        winw = 420, winh = 240, msaa = 0;
 
     // help
     printf("----\n");
