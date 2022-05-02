@@ -159,6 +159,7 @@ vec pd; // wheel direction
 vec pbd;// body direction
 f32 sp; // speed
 uint cp;// collected porygon count
+uint cc;// collision count
 double st=0; // start time
 char tts[32];// time taken string
 
@@ -552,6 +553,25 @@ void rCube(f32 x, f32 y)
 
     // check to see if cube needs to be blue
     const f32 dla = vDist(pp, (vec){x, y, 0.f}); // worth it to prevent the flicker
+
+    static f32 colliding = 0.f;
+    if(dla <= 0.13f)
+    {
+        if(colliding == 0.f)
+        {
+            colliding = x*y+x;
+            cc++;
+
+            char strts[16];
+            timestamp(&strts[0]);
+            printf("[%s] Collisions: %u\n", strts, cc);
+        }
+    }
+    else if(x*y+x == colliding)
+    {
+        colliding = 0.f;
+    }
+
     const uint collision = (dla < 0.17f || dlap < 0.16f);
     if(collision == 1 && bindstate2 <= 1)
     {
@@ -779,6 +799,7 @@ void newGame(unsigned int seed)
     st = 0;
 
     cp = 0;
+    cc = 0;
     pr = 0.f;
     sr = 0.f;
     sp = 0.f;
@@ -1126,6 +1147,11 @@ void main_loop()
             cp++;
             za = t+6.0;
             iterDNA();
+
+            char strts[16];
+            timestamp(&strts[0]);
+            printf("[%s] Porygon collected: %u, collisions: %u\n", strts, cp, cc);
+            cc = 0;
         }
     }
     else if(t > za)
