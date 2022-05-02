@@ -11,6 +11,6 @@ I have excluded the dataset files because they are huge, at the time of writing 
 
 It is much more efficient to make a dataset using [/multitraincli](/multitraincli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
-The amount of rounds to execute is the first command line parameter, `cd multitraincli;./porydrive 32;`, for example, would execute one process for 32 rounds. There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh) which will execute 128 processes for 8 rounds.
+The amount of rounds to execute is the first command line parameter, `cd multitraincli;./porydrive 32;`, for example, would execute one process for 32 rounds. There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh).
 
 The second command line parameter is the amount of seconds before the process times out, e.g timeout after 33 seconds, `cd multitraincli;./porydrive 32 33;`.
