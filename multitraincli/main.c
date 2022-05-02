@@ -68,12 +68,8 @@
 #include <sys/time.h>
 
 //#define uint GLushort
-#define sint GLshort
-#define f32 GLfloat
-
-#include "inc/gl.h"
-#define GLFW_INCLUDE_NONE
-#include "inc/glfw3.h"
+#define sint short
+#define f32 float
 
 #ifndef __x86_64__
     #define NOSSE
@@ -82,40 +78,18 @@
 // uncommenting this define will enable the MMX random when using fRandFloat (it's a marginally slower)
 #define SEIR_RAND
 
-#include "inc/esAux2.h"
-
-#include "inc/res.h"
-#include "assets/purplecube.h"
-#include "assets/porygon.h"
-#include "assets/dna.h"
-#include "assets/body.h"
-#include "assets/windows.h"
-#include "assets/wheel.h"
+#include "../inc/vec.h"
+#include "../inc/mat.h"
 
 //*************************************
 // globals
 //*************************************
-GLFWwindow* window;
-uint winw = 1024;
-uint winh = 768;
+
+// game logic
 double t = 0;   // time
 double dt = 0;  // delta time
-double fc = 0;  // frame count
 double lfct = 0;// last frame count time
-f32 aspect;
-double x,y,lx,ly;
-double rww, ww, rwh, wh, ww2, wh2;
-double uw, uh, uw2, uh2; // normalised pixel dpi
-
-// render state id's
-GLint projection_id;
-GLint modelview_id;
-GLint position_id;
-GLint lightpos_id;
-GLint solidcolor_id;
-GLint color_id;
-GLint opacity_id;
-GLint normal_id;
+uint fc = 0;  // frame count
 
 // render state matrices
 mat projection;
@@ -124,20 +98,10 @@ mat model;
 mat modelview;
 mat viewrot;
 
-// render state inputs
-vec lightpos = {0.f, 0.f, 0.f};
-
 // models
 sint bindstate = -1;
 sint bindstate2 = -1;
 uint keystate[6] = {0};
-ESModel mdlPurpleCube;
-GLuint mdlBlueCubeColors;
-ESModel mdlPorygon;
-ESModel mdlDNA;
-ESModel mdlBody;
-ESModel mdlWindows;
-ESModel mdlWheel;
 
 // game vars
 #define FAR_DISTANCE 1000.f
@@ -389,13 +353,13 @@ uint64_t urand()
     return s;
 }
 
-uint64_t microtime()
+double glfwGetTime()
 {
     struct timeval tv;
     struct timezone tz;
     memset(&tz, 0, sizeof(struct timezone));
     gettimeofday(&tv, &tz);
-    return 1000000 * tv.tv_sec + tv.tv_usec;
+    return ((double)tv.tv_sec) + (((double)tv.tv_usec)/1000000.0);
 }
 
 int forceTrim(const char* file, const size_t trim)
@@ -426,71 +390,11 @@ int forceTrim(const char* file, const size_t trim)
 // render functions
 //*************************************
 
-__attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // C code reduction helper (more inline opcodes)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, mdl->cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdl->vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdl->nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdl->iid);
-}
-
-void iterDNA()
-{
-    // so that you don't get confused I am exploiting the
-    // fact that when a colour channel goes into minus
-    // figures very strange things begin to happen to the
-    // gradient between triangle verticies.
-    static const uint mi = dna_numvert*3;
-    static f32 cd = 1.f;
-    for(uint i = 0; i < mi; i++) // lavalamp it
-    {
-        dna_colors[i] += fRandFloat(0.1f, 0.6f) * cd;
-
-        // and this piece of code prevents it looking like a random mess,
-        // gives some structure. This is the lava lamper.
-        if(dna_colors[i] >= 1.f)
-            cd = -1.f;
-        else if(dna_colors[i] <= 0.f)
-            cd = 1.f;
-    }
-    esRebind(GL_ARRAY_BUFFER, &mdlDNA.cid, dna_colors, sizeof(dna_colors), GL_STATIC_DRAW);
-}
-
 void rCube(f32 x, f32 y)
 {
     mIdent(&model);
     mTranslate(&model, x, y, 0.f);
     mMul(&modelview, &model, &view);
-
-    glUniform1f(opacity_id, 1.0f);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    if(bindstate != 1)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.vid);
-        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(position_id);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.nid);
-        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(normal_id);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPurpleCube.iid);
-
-        bindstate = 1;
-        bindstate2 = -1;
-    }
 
     // cube collisions
     const f32 dlap = vDistLa(zp, (vec){x, y, 0.f}); // porygon
@@ -571,30 +475,10 @@ void rCube(f32 x, f32 y)
     {
         colliding = 0.f;
     }
-
-    const uint collision = (dla < 0.17f || dlap < 0.16f);
-    if(collision == 1 && bindstate2 <= 1)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCubeColors);
-        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(color_id);
-        bindstate2 = 2;
-    }
-    else if(collision == 0 && bindstate2 != 1)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.cid);
-        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(color_id);
-        bindstate2 = 1;
-    }
-
-    glDrawElements(GL_TRIANGLES, purplecube_numind, GL_UNSIGNED_SHORT, 0);
 }
 
 void rPorygon(f32 x, f32 y, f32 r)
 {
-    bindstate = -1;
-
     mIdent(&model);
     mTranslate(&model, x, y, 0.f);
     mRotZ(&model, r);
@@ -607,28 +491,10 @@ void rPorygon(f32 x, f32 y, f32 r)
     // returns direction
     mGetDirY(&zd, model);
     vInv(&zd);
-
-    if(za != 0.0)
-        glUniform1f(opacity_id, (za-t)/6.0);
-    else
-        glUniform1f(opacity_id, 1.0f);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-
-    modelBind(&mdlPorygon);
-
-    if(za != 0.0)
-        glEnable(GL_BLEND);
-    glDrawElements(GL_TRIANGLES, porygon_numind, GL_UNSIGNED_SHORT, 0);
-    if(za != 0.0)
-        glDisable(GL_BLEND);
 }
 
 void rDNA(f32 x, f32 y, f32 z)
 {
-    bindstate = -1;
-
     static f32 dr = 0.f;
     dr += 1.f * dt;
 
@@ -636,24 +502,10 @@ void rDNA(f32 x, f32 y, f32 z)
     mTranslate(&model, x, y, z);
     mRotZ(&model, dr);
     mMul(&modelview, &model, &view);
-
-    glUniform1f(opacity_id, 1.0f);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlDNA);
-
-    glDrawElements(GL_TRIANGLES, dna_numind, GL_UNSIGNED_SHORT, 0);
 }
 
 void rCar(f32 x, f32 y, f32 z, f32 rx)
 {
-    bindstate = -1;
-
-    // opaque
-    glUniform1f(opacity_id, 1.0f);
-
     // wheel spin speed
     static f32 wr = 0.f;
     const f32 speed = sp * 33.f;
@@ -674,13 +526,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mRotY(&model, -wr);
     mMul(&modelview, &model, &view);
 
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
-
     // wheel; back left
 
     mIdent(&model);
@@ -689,13 +534,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mTranslate(&model, 0.026343f, 0.045294f, 0.012185f);
     mRotY(&model, -wr);
     mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
     // wheel; front right
 
@@ -708,13 +546,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mRotY(&model, wr);
     mMul(&modelview, &model, &view);
 
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
-
     // wheel; back right
 
     mIdent(&model);
@@ -724,13 +555,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mTranslate(&model, 0.026343f, -0.045294f, 0.012185f);
     mRotY(&model, wr);
     mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
     // body & window matrix
 
@@ -751,30 +575,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     // if(sx < -0.03f){sx = -0.03f;}
     mRotX(&model, sx);
     mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    // body
-
-    modelBind(&mdlBody);
-
-    glDisable(GL_CULL_FACE);
-    glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
-    glEnable(GL_CULL_FACE);
-
-    // transparent
-    glUniform1f(opacity_id, 0.3f);
-
-    // windows
-
-    modelBind(&mdlWindows);
-
-    glEnable(GL_BLEND);
-    glDepthMask(GL_FALSE);
-    glDrawElements(GL_TRIANGLES, windows_numind, GL_UNSIGNED_SHORT, 0);
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
 }
 
 //*************************************
@@ -789,8 +589,6 @@ void newGame(unsigned int seed)
     char strts[16];
     timestamp(&strts[0]);
     printf("[%s] Game Start [%u].\n", strts, seed);
-    
-    glfwSetWindowTitle(window, "PoryDrive");
     
     pp = (vec){0.f, 0.f, 0.f};
     pv = (vec){0.f, 0.f, 0.f};
@@ -899,16 +697,15 @@ void main_loop()
 //*************************************
 // update title bar stats
 //*************************************
-    static double ltut = 3.0;
-    if(t > ltut)
-    {
-        timeTaken(1);
-        char title[256];
-        const f32 dsp = fabsf(sp*(1.f/maxspeed)*130.f);
-        sprintf(title, "| %s | Speed %.f MPH | Porygon %u | %s", tts, dsp, cp, cname);
-        glfwSetWindowTitle(window, title);
-        ltut = t + 1.0;
-    }
+    // static double ltut = 3.0;
+    // if(t > ltut)
+    // {
+    //     timeTaken(1);
+    //     char title[256];
+    //     const f32 dsp = fabsf(sp*(1.f/maxspeed)*130.f);
+    //     printf("| %s | Speed %.f MPH | Porygon %u | %s\n", tts, dsp, cp, cname);
+    //     ltut = t + 1.0;
+    // }
 
 //*************************************
 // auto drive
@@ -1144,7 +941,6 @@ void main_loop()
         {
             cp++;
             za = t+6.0;
-            iterDNA();
 
             char strts[16];
             timestamp(&strts[0]);
@@ -1166,36 +962,6 @@ void main_loop()
     }
 
 //*************************************
-// camera
-//*************************************
-
-    if(focus_cursor == 1)
-    {
-        glfwGetCursorPos(window, &x, &y);
-
-        xrot += (ww2-x)*sens;
-        yrot += (wh2-y)*sens;
-
-        if(yrot > 1.5f)
-            yrot = 1.5f;
-        if(yrot < 0.5f)
-            yrot = 0.5f;
-
-        glfwSetCursorPos(window, ww2, wh2);
-    }
-
-    mIdent(&view);
-    mTranslate(&view, 0.f, -0.033f, zoom);
-    mRotate(&view, yrot, 1.f, 0.f, 0.f);
-    mRotate(&view, xrot, 0.f, 0.f, 1.f);
-    mTranslate(&view, -pp.x, -pp.y, -pp.z);
-
-//*************************************
-// begin render
-//*************************************
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//*************************************
 // main render
 //*************************************
 
@@ -1213,218 +979,6 @@ void main_loop()
 
     // render player
     rCar(pp.x, pp.y, pp.z, pr);
-
-
-//*************************************
-// swap buffers / display render
-//*************************************
-    glfwSwapBuffers(window);
-}
-
-//*************************************
-// Input Handelling
-//*************************************
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    // control
-    if(action == GLFW_PRESS)
-    {
-        if(key == GLFW_KEY_A){ keystate[0] = 1; keystate[1] = 0; }
-        else if(key == GLFW_KEY_D){ keystate[1] = 1; keystate[0] = 0; }
-        else if(key == GLFW_KEY_W){ keystate[2] = 1; }
-        else if(key == GLFW_KEY_S){ keystate[3] = 1; }
-        else if(key == GLFW_KEY_SPACE){ keystate[4] = 1; }
-
-        // new game
-        else if(key == GLFW_KEY_N)
-        {
-            // end
-            timeTaken(0);
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] Game End.\n", strts);
-            printf("[%s] Porygon Collected: %u\n", strts, cp);
-            printf("[%s] Time-Taken: %s or %g Seconds\n\n", strts, tts, t-st);
-            
-            // new
-            newGame(time(0));
-        }
-
-        // else if(key == GLFW_KEY_R)
-        // {
-        //     printf("%g %g %g\n", dna_colors[0], dna_colors[1], dna_colors[2]);
-        //     iterDNA();
-        //     cp++;
-        // }
-
-        // stats
-        else if(key == GLFW_KEY_P)
-        {
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] Porygon Collected: %u\n", strts, cp);
-        }
-
-        // toggle mouse focus
-        if(key == GLFW_KEY_ESCAPE)
-        {
-            focus_cursor = 1 - focus_cursor;
-            if(focus_cursor == 0)
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            else
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-            glfwSetCursorPos(window, ww2, wh2);
-            glfwGetCursorPos(window, &ww2, &wh2);
-        }
-
-        // physics types
-        else if(key == GLFW_KEY_1)
-            configOriginal();
-        else if(key == GLFW_KEY_2)
-            configScarlet();
-        else if(key == GLFW_KEY_3)
-            configScarletFast();
-        else if(key == GLFW_KEY_4)
-            configHybrid();
-        else if(key == GLFW_KEY_5)
-            loadConfig(1);
-        // else if(key == GLFW_KEY_LEFT_SHIFT)
-        //     configOriginal();
-
-        // show average fps
-        else if(key == GLFW_KEY_F)
-        {
-            if(t-lfct > 2.0)
-            {
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] FPS: %g\n", strts, fc/(t-lfct));
-                lfct = t;
-                fc = 0;
-            }
-        }
-
-        // toggle auto drive
-        else if(key == GLFW_KEY_O)
-        {
-            auto_drive = 1 - auto_drive;
-            if(auto_drive == 0)
-            {
-                sp = 0.f;
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Auto Drive: OFF\n", strts);
-            }
-            else
-            {
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Auto Drive: ON\n", strts);
-            }
-        }
-
-        // toggle neural drive
-        else if(key == GLFW_KEY_I)
-        {
-            neural_drive = 1 - neural_drive;
-            if(neural_drive == 0)
-            {
-                sp = 0.f;
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Neural Drive: OFF\n", strts);
-            }
-            else
-            {
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Neural Drive: ON\n", strts);
-            }
-        }
-
-        // toggle auto drive
-        else if(key == GLFW_KEY_L)
-        {
-            dataset_logger = 1 - dataset_logger;
-
-            if(dataset_logger == 1)
-            {
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Dataset Logger: ON\n", strts);
-            }
-            else
-            {
-                FILE* f = fopen("dataset_size.txt", "w");
-                if(f != NULL)
-                {
-                    struct stat st;
-                    stat("dataset_y.dat", &st);
-                    fprintf(f, "%ld", st.st_size/8);
-                    fclose(f);
-                }
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Dataset Logger: OFF\n", strts);
-            }
-        }
-    }
-    else if(action == GLFW_RELEASE)
-    {
-        if(key == GLFW_KEY_A){ keystate[0] = 0; }
-        else if(key == GLFW_KEY_D){ keystate[1] = 0; }
-        else if(key == GLFW_KEY_W){ keystate[2] = 0; }
-        else if(key == GLFW_KEY_S){ keystate[3] = 0; }
-        else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
-        // else if(key == GLFW_KEY_LEFT_SHIFT)
-        //     configScarletFast();
-    }
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    if(yoffset == -1)
-        zoom += 0.06f * zoom;
-    else if(yoffset == 1)
-        zoom -= 0.06f * zoom;
-    
-    if(zoom > -0.11f){zoom = -0.11f;}
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if(action == GLFW_PRESS)
-    {
-        if(button == GLFW_MOUSE_BUTTON_4 || button == GLFW_MOUSE_BUTTON_RIGHT)
-        {
-            if(zoom != -0.3f)
-                zoom = -0.3f;
-            else
-                zoom = -3.3f;
-        }
-    }
-}
-
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
-    winw = width;
-    winh = height;
-
-    glViewport(0, 0, winw, winh);
-    aspect = (f32)winw / (f32)winh;
-    ww = winw;
-    wh = winh;
-    rww = 1/ww;
-    rwh = 1/wh;
-    ww2 = ww/2;
-    wh2 = wh/2;
-    uw = (double)aspect / ww;
-    uh = 1 / wh;
-    uw2 = (double)aspect / ww2;
-    uh2 = 1 / wh2;
-
-    mIdent(&projection);
-    mPerspective(&projection, 60.0f, aspect, 0.01f, FAR_DISTANCE*2.f); 
 }
 
 //*************************************
@@ -1436,13 +990,9 @@ int main(int argc, char** argv)
     int msaa = 16;
     if(argc == 2){msaa = atoi(argv[1]);}
 
-    // trigger special mode
-    if(argc == 3)
-        winw = 420, winh = 240;
-
     // help
     printf("----\n");
-    printf("PoryDrive\n");
+    printf("PoryDriveCli\n");
     printf("----\n");
     printf("James William Fletcher (james@voxdsp.com)\n");
     printf("----\n");
@@ -1485,128 +1035,38 @@ int main(int argc, char** argv)
     printf("steeringtransferinertia 280\n");
     printf("----\n");
 
-    // init glfw
-    if(!glfwInit()){exit(EXIT_FAILURE);}
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_SAMPLES, msaa);
-    window = glfwCreateWindow(winw, winh, "PoryDrive", NULL, NULL);
-    if(!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    const GLFWvidmode* desktop = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    glfwSetWindowPos(window, (desktop->width/2)-(winw/2), (desktop->height/2)-(winh/2)); // center window on desktop
-    glfwSetWindowSizeCallback(window, window_size_callback);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-    glfwMakeContextCurrent(window);
-    gladLoadGL(glfwGetProcAddress);
-    glfwSwapInterval(1); // 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync
-
-    // set icon
-    glfwSetWindowIcon(window, 1, &(GLFWimage){16, 16, (unsigned char*)&icon_image.pixel_data});
-
-    // hide cursor
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-    // reset mouse for camera rotation
-    glfwSetCursorPos(window, ww2, wh2);
-    glfwGetCursorPos(window, &ww2, &wh2);
-
-//*************************************
-// projection
-//*************************************
-
-    window_size_callback(window, winw, winh);
-
-//*************************************
-// bind vertex and index buffers
-//*************************************
-
-    // ***** BIND BODY *****
-    esBind(GL_ARRAY_BUFFER, &mdlBody.vid, body_vertices, sizeof(body_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBody.nid, body_normals, sizeof(body_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBody.iid, body_indices, sizeof(body_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBody.cid, body_colors, sizeof(body_colors), GL_STATIC_DRAW);
-
-    // ***** BIND WINDOWS *****
-    esBind(GL_ARRAY_BUFFER, &mdlWindows.vid, windows_vertices, sizeof(windows_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlWindows.nid, windows_normals, sizeof(windows_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlWindows.iid, windows_indices, sizeof(windows_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlWindows.cid, windows_colors, sizeof(windows_colors), GL_STATIC_DRAW);
-
-    // ***** BIND WHEEL *****
-    esBind(GL_ARRAY_BUFFER, &mdlWheel.vid, wheel_vertices, sizeof(wheel_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlWheel.nid, wheel_normals, sizeof(wheel_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlWheel.iid, wheel_indices, sizeof(wheel_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlWheel.cid, wheel_colors, sizeof(wheel_colors), GL_STATIC_DRAW);
-
-    // ***** BIND PURPLE CUBE *****
-    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.vid, purplecube_vertices, sizeof(purplecube_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.nid, purplecube_normals, sizeof(purplecube_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.iid, purplecube_indices, sizeof(purplecube_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.cid, purplecube_colors, sizeof(purplecube_colors), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBlueCubeColors, bluecube_colors, sizeof(bluecube_colors), GL_STATIC_DRAW);
-
-    // ***** BIND PORYGON *****
-    esBind(GL_ARRAY_BUFFER, &mdlPorygon.vid, porygon_vertices, sizeof(porygon_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlPorygon.nid, porygon_normals, sizeof(porygon_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlPorygon.iid, porygon_indices, sizeof(porygon_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlPorygon.cid, porygon_colors, sizeof(porygon_colors), GL_STATIC_DRAW);
-
-    // ***** BIND DNA *****
-    esBind(GL_ARRAY_BUFFER, &mdlDNA.vid, dna_vertices, sizeof(dna_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlDNA.nid, dna_normals, sizeof(dna_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlDNA.iid, dna_indices, sizeof(dna_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlDNA.cid, dna_colors, sizeof(dna_colors), GL_STATIC_DRAW);
-
-//*************************************
-// compile & link shader programs
-//*************************************
-
-    //makeAllShaders();
-    makeLambert3();
-
-//*************************************
-// configure render options
-//*************************************
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glBlendEquation(GL_FUNC_ADD);
-    
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.13, 0.13, 0.13, 0.0);
-
-    shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
-    glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
 
 //*************************************
 // execute update / render loop
 //*************************************
 
     // init
-    configScarlet();
-    loadConfig(0);
-    if(argc == 3)
-        randGame();
-    else
-        newGame(NEWGAME_SEED);
+    configScarletFast();
+    randGame();
 
     // reset
     t = glfwGetTime();
     lfct = t;
+
+    double ltt = 0;
     
     // event loop
-    while(!glfwWindowShouldClose(window))
+    while(1)
     {
+        usleep(1000000/144);
         t = glfwGetTime();
-        glfwPollEvents();
         main_loop();
+
         fc++;
+        if(t > ltt)
+        {
+            timeTaken(0);
+            char strts[16];
+            timestamp(&strts[0]);
+            printf("[%s] CPS: %u\n", strts, fc/32);
+            fc = 0;
+            ltt = t+32.0;
+        }
     }
 
     // end
@@ -1618,8 +1078,6 @@ int main(int argc, char** argv)
     printf("[%s] Time-Taken: %s or %g Seconds\n\n", strts, tts, t-st);
 
     // done
-    glfwDestroyWindow(window);
-    glfwTerminate();
     exit(EXIT_SUCCESS);
     return 0;
 }
