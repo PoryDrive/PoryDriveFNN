@@ -50,6 +50,7 @@
 // game logic
 double t = 0;   // time
 double dt = 0;  // delta time
+double timeout = 0; // timeout after
 
 // render state matrices
 mat projection;
@@ -880,8 +881,10 @@ int main(int argc, char** argv)
 
     // how many rounds to run for
     mcp = 512;
-    if(argc == 2){mcp = atoi(argv[1]);}
-    printf("Running for %u rounds.\n----\n", mcp);
+    if(argc >= 2){mcp = atoi(argv[1]);}
+    timeout = 0;
+    if(argc >= 3){timeout = atof(argv[2]);}
+    printf("Running for %u rounds with a timeout of %g seconds.\n----\n", mcp, timeout);
 
     // i did consider threading this, and having a log buffer
     // per thread that got aggregated by a logging thread
@@ -897,6 +900,7 @@ int main(int argc, char** argv)
     randGame();
 
     // reset
+    const double st = glfwGetTime();
     t = glfwGetTime();
 
     double ltt = 0;
@@ -919,6 +923,9 @@ int main(int argc, char** argv)
             fc = 0;
             ltt = t+32.0;
         }
+
+        if(timeout != 0 && t-st >= timeout)
+            return 0;
     }
 
     // done
