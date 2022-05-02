@@ -947,8 +947,6 @@ void main_loop()
         else
             sp = maxspeed;
     }
-    // on each porygon death set new random hyper parameters for autodrive
-    // this should make for a more interesting dataset.
 
     // neural net
     if(neural_drive == 1) // Feed-Forward Neural Network (FNN)
