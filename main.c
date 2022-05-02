@@ -788,7 +788,7 @@ void newGame(unsigned int seed)
 
     char strts[16];
     timestamp(&strts[0]);
-    printf("\n[%s] Game Start [%u].\n", strts, seed);
+    printf("[%s] Game Start [%u].\n", strts, seed);
     
     glfwSetWindowTitle(window, "PoryDrive");
     
