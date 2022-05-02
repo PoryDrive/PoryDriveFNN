@@ -1601,7 +1601,6 @@ int main(int argc, char** argv)
     lfct = t;
     
     // efficient event loop
-    const double fps_limit = 1.0 / 144.0;
     const useconds_t wait = 1000000 / 144;
     while(!glfwWindowShouldClose(window))
     {
