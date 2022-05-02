@@ -1004,6 +1004,7 @@ void main_loop()
         }
         else
         {
+            printf("Failed to fopen() X file. Skipping Y file.\n");
             eskip = 1; // failed to even open the first file... skip the second
         }
 
@@ -1021,7 +1022,7 @@ void main_loop()
                     printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
                     if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that too
                     {
-                        printf("Failed to repair X file. Exiting.\n");
+                        printf("Failed to revert X file. Exiting.\n");
                         rename("dataset_x.dat", "dataset_x.dat_dirty");
                         rename("dataset_y.dat", "dataset_y.dat_dirty");
                         exit(0);
@@ -1037,8 +1038,22 @@ void main_loop()
                 }
                 fclose(f);
             }
+            else
+            {
+                printf("Failed to fopen() Y file. Reverting X write.\n");
+                if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that too
+                {
+                    printf("Failed to revert X file. Exiting.\n");
+                    rename("dataset_x.dat", "dataset_x.dat_dirty");
+                    rename("dataset_y.dat", "dataset_y.dat_dirty");
+                    exit(0);
+                }
+            }
         }
     }
+
+    // writing the targets to a seperate file makes file io errors more annoying to catch, but it does streamline
+    // the process of loading that data into Keras.
     
     // dataset logging
     //printf("%f %f %f %f\n", (vAngle(pbd)*-1.f)+d2PI, vAngle(lad)+d2PI, vDot(pbd, lad)+1.f, vDist(pp, zp));
