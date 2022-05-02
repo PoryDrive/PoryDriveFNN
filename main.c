@@ -1244,9 +1244,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             timeTaken(0);
             char strts[16];
             timestamp(&strts[0]);
+            printf("\n[%s] Game End.\n", strts);
             printf("[%s] Porygon Collected: %u\n", strts, cp);
-            printf("[%s] Time-Taken: %s or %g Seconds\n", strts, tts, t-st);
-            printf("[%s] Game End.\n", strts);
+            printf("[%s] Time-Taken: %s or %g Seconds\n\n", strts, tts, t-st);
             
             // new
             newGame(time(0));
@@ -1612,9 +1612,9 @@ int main(int argc, char** argv)
     timeTaken(0);
     char strts[16];
     timestamp(&strts[0]);
+    printf("\n[%s] Game End.\n", strts);
     printf("[%s] Porygon Collected: %u\n", strts, cp);
-    printf("[%s] Time-Taken: %s or %g Seconds\n", strts, tts, t-st);
-    printf("[%s] Game End.\n\n", strts);
+    printf("[%s] Time-Taken: %s or %g Seconds\n\n", strts, tts, t-st);
 
     // done
     glfwDestroyWindow(window);
