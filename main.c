@@ -1504,7 +1504,7 @@ int main(int argc, char** argv)
     glfwSetScrollCallback(window, scroll_callback);
     glfwMakeContextCurrent(window);
     gladLoadGL(glfwGetProcAddress);
-    glfwSwapInterval(1); // 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync
+    glfwSwapInterval(0); // 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync
 
     // set icon
     glfwSetWindowIcon(window, 1, &(GLFWimage){16, 16, (unsigned char*)&icon_image.pixel_data});
@@ -1600,14 +1600,33 @@ int main(int argc, char** argv)
     t = glfwGetTime();
     lfct = t;
     
-    // event loop
+    // efficient event loop
+    const double fps_limit = 1.0 / 144.0;
+    const useconds_t wait = 1000000 / 144;
     while(!glfwWindowShouldClose(window))
     {
+        usleep(wait);
         t = glfwGetTime();
         glfwPollEvents();
         main_loop();
         fc++;
     }
+
+    // accurate event loop
+    // const double fps_limit = 1.0 / 144.0;
+    // double fpsllt = 0.f;
+    // while(!glfwWindowShouldClose(window))
+    // {
+    //     usleep(100);
+    //     t = glfwGetTime();
+    //     if(t > fpsllt)
+    //     {
+    //         glfwPollEvents();
+    //         main_loop();
+    //         fc++;
+    //         fpsllt = t + fps_limit;
+    //     }
+    // }
 
     // end
     timeTaken(0);
