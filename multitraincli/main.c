@@ -1,56 +1,15 @@
 /*
     James William Fletcher (james@voxdsp.com)
-        April 2022
+        May 2022
 
     Info:
     
-        PoryDrive2, a simple 3D driving game.
+        Stripped back version of PoryDrive to
+        remove any gfx rendering.
 
-        This version is targeted at just Tensorflow Keras training.
-
-
-    Keyboard:
-
-        ESCAPE = Focus/Unfocus Mouse Look
-        F = FPS to console
-        P = Player stats to console
-        N = New Game
-        W = Drive Forward
-        A = Turn Left
-        S = Drive Backward
-        D = Turn Right
-        Space = Breaks
-        1-5 = Car Physics config selection (5 loads from file)
-
-
-    Mouse:
-
-        RIGHT CLICK/MOUSE4 = Zoom Snap Close/Ariel
-        Scroll = Zoom in/out
-
-    
-    Notes:
-
-        Although the 3D model is sourced ready made from a third-party I cannot
-        stress enough how much work I had to put in to vertex colouring the segments,
-        deleting non-visible faces and generally just cleaning up parts of the mesh
-        before and after triangulating it. It was a few hours of work, more finicky
-        than anything.
-
-        It made me think that it would be nice to have a program that automatically
-        deleted non-visible faces for me, for example, so a render pass from many
-        angles across a sphere like peeling an orange top to bottom with a fixed
-        increment step. Even still, you get a similar effect in Blender by selecting
-        visible faces from multiple angles until you feel like you have all the
-        important ones, then you can hide them and delete what was hiding behind them
-        or just invert the selection and delete. But the mesh ideally still needs
-        some minor cleaning after the fact.
-
-        The windows are still double layered, it's probably not necesary but I left
-        it that way.
-
-        This game really is about that E34 car model from you know who automobile
-        manafacturer, eveything else is well, garnish.
+        For the purpose of creating datasets
+        for neural networks as a multi-process
+        model with file locking.
 
 */
 
@@ -482,17 +441,6 @@ void rPorygon(f32 x, f32 y, f32 r)
     vInv(&zd);
 }
 
-void rDNA(f32 x, f32 y, f32 z)
-{
-    static f32 dr = 0.f;
-    dr += 1.f * dt;
-
-    mIdent(&model);
-    mTranslate(&model, x, y, z);
-    mRotZ(&model, dr);
-    mMul(&modelview, &model, &view);
-}
-
 void rCar(f32 x, f32 y, f32 z, f32 rx)
 {
     // wheel spin speed
@@ -512,39 +460,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mGetDirY(&pd, model);
     vInv(&pd);
 
-    mRotY(&model, -wr);
-    mMul(&modelview, &model, &view);
-
-    // wheel; back left
-
-    mIdent(&model);
-    mTranslate(&model, x, y, z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, 0.045294f, 0.012185f);
-    mRotY(&model, -wr);
-    mMul(&modelview, &model, &view);
-
-    // wheel; front right
-
-    mIdent(&model);
-    mRotZ(&model, PI);
-    mTranslate(&model, -x, -y, -z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, 0.054417f, 0.012185f);
-    mRotZ(&model, sr);
-    mRotY(&model, wr);
-    mMul(&modelview, &model, &view);
-
-    // wheel; back right
-
-    mIdent(&model);
-    mRotZ(&model, PI);
-    mTranslate(&model, -x, -y, -z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, -0.045294f, 0.012185f);
-    mRotY(&model, wr);
-    mMul(&modelview, &model, &view);
-
     // body & window matrix
 
     mIdent(&model);
@@ -554,16 +469,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     // returns direction
     mGetDirY(&pbd, model);
     vInv(&pbd);
-
-    f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
-    if(sy > 0.03f){sy = 0.03f;}
-    if(sy < -0.03f){sy = -0.03f;}
-    mRotY(&model, sy);
-    f32 sx = sr*30.f*sp; // turning suspension
-    // if(sx > 0.03f){sx = 0.03f;}
-    // if(sx < -0.03f){sx = -0.03f;}
-    mRotX(&model, sx);
-    mMul(&modelview, &model, &view);
 }
 
 //*************************************
@@ -574,10 +479,6 @@ void newGame(unsigned int seed)
 {
     srand(urand());
     srandf(urand());
-
-    // char strts[16];
-    // timestamp(&strts[0]);
-    // printf("[%s] Game Start [%u].\n", strts, seed);
     
     pp = (vec){0.f, 0.f, 0.f};
     pv = (vec){0.f, 0.f, 0.f};
@@ -592,7 +493,6 @@ void newGame(unsigned int seed)
     sp = 0.f;
 
     zp = (vec){uRandFloat(-18.f, 18.f), uRandFloat(-18.f, 18.f), 0.f};
-    //zp = (vec){0.f, 0.3f, 0.f};
     zs = 0.3f;
     za = 0.0;
     zt = 8.f;
@@ -958,9 +858,6 @@ void main_loop()
     // render porygon
     rPorygon(zp.x, zp.y, zr);
 
-    // render dna
-    rDNA(0.f, 0.f, 0.1f);
-
     // render player
     rCar(pp.x, pp.y, pp.z, pr);
 }
@@ -989,7 +886,8 @@ int main(int argc, char** argv)
     // i did consider threading this, and having a log buffer
     // per thread that got aggregated by a logging thread
     // but it was just easier to multi-process it
-    // and it's adequate.
+    // and it's adequate. I've not witnessed the file locking
+    // cause any impact on the CPS.
 
     // screen refresh rate
     const useconds_t wait = 1000000/144;
