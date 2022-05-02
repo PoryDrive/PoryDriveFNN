@@ -1,1 +1,1 @@
-for i in {1..256}; do xterm -e "./porydrivecli 1 66" & done
+for i in {1..128}; do xterm -e "./porydrivecli 8 120" & done
