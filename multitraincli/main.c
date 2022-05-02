@@ -939,7 +939,7 @@ int main(int argc, char** argv)
 //*************************************
 
     // screen refresh rate
-    const useconds_t wait = 1000000/120; //144
+    const useconds_t wait = 1000000/144;
 
     // init
     configScarletFast();
