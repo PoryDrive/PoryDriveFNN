@@ -976,9 +976,19 @@ void main_loop()
         {
             if(fread(&ret, 2, sizeof(float), f) == sizeof(float))
             {
-                // set new vars
-                sr = ret[0];
-                sp = ret[1];
+                // lock range
+                // if(ret[0] < -1.f){ret[0] = -1.f;}
+                // if(ret[0] > 1.f){ret[0] = 1.f;}
+                // if(ret[1] < -1.f){ret[1] = -1.f;}
+                // if(ret[1] > 1.f){ret[1] = 1.f;}
+                //printf("%f %f %u %u\n", ret[0], ret[1], isnan(ret[0]), isnan(ret[1]));
+
+                if(isnan(ret[0]) == 0 && isnan(ret[1]) == 0)
+                {
+                    // set new vars
+                    sr = ret[0];
+                    sp = ret[1];
+                }
             }
             fclose(f);
         }
