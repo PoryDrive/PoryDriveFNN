@@ -88,8 +88,6 @@
 // game logic
 double t = 0;   // time
 double dt = 0;  // delta time
-double lfct = 0;// last frame count time
-uint fc = 0;  // frame count
 
 // render state matrices
 mat projection;
@@ -98,21 +96,8 @@ mat model;
 mat modelview;
 mat viewrot;
 
-// models
-sint bindstate = -1;
-sint bindstate2 = -1;
-uint keystate[6] = {0};
-
 // game vars
-#define FAR_DISTANCE 1000.f
 #define NEWGAME_SEED 1337
-
-// camera vars
-uint focus_cursor = 1;
-double sens = 0.001f;
-f32 xrot = 2.6f;
-f32 yrot = 1.f;
-f32 zoom = -0.3f;
 
 // player vars
 f32 pr; // rotation
@@ -626,7 +611,6 @@ void randGame()
 
     auto_drive = 1;
     dataset_logger = 1;
-    focus_cursor = 0;
 
     char strts[16];
     timestamp(&strts[0]);
@@ -646,56 +630,7 @@ void main_loop()
     lt = t;
 
 //*************************************
-// keystates
-//*************************************
-    f32 tr = maxsteer * ((maxspeed-sp) * steerinertia);
-    if(tr < minsteer){tr = minsteer;}
-
-    if(keystate[0] == 1)
-    {
-        sr -= steeringspeed * dt;
-        if(sr < -tr){sr = -tr;}
-    }
-
-    if(keystate[1] == 1)
-    {
-        sr += steeringspeed * dt;
-        if(sr > tr){sr = tr;}
-    }
-
-    if(keystate[0] == 0 && keystate[1] == 0)
-    {
-        if(sr > 0.006f)
-            sr -= steeringspeed * dt;
-        else if(sr < -0.006f)
-            sr += steeringspeed * dt;
-        else
-            sr = 0.f;
-    }
-    
-    if(keystate[2] == 1)
-    {
-        vec inc;
-        sp += acceleration * dt;
-        vMulS(&inc, pd, acceleration * dt);
-        vAdd(&pv, pv, inc);
-    }
-
-    if(keystate[3] == 1)
-    {    
-        vec inc;
-        sp -= acceleration * dt;
-        vMulS(&inc, pd, -acceleration * dt);
-        vAdd(&pv, pv, inc);
-    }
-
-    if(keystate[4] == 1)
-    {
-        sp *= 0.99f * (1.f-dt);
-    }
-
-//*************************************
-// update title bar stats
+// update stats
 //*************************************
     // static double ltut = 3.0;
     // if(t > ltut)
@@ -710,6 +645,9 @@ void main_loop()
 //*************************************
 // auto drive
 //*************************************
+    f32 tr = maxsteer * ((maxspeed-sp) * steerinertia);
+    if(tr < minsteer){tr = minsteer;}
+    
     // side winder 1
     /*
         vec lad = pp;
@@ -1046,9 +984,9 @@ int main(int argc, char** argv)
 
     // reset
     t = glfwGetTime();
-    lfct = t;
 
-    double ltt = 0;
+    // double ltt = 0;
+    // uint fc = 0;
     
     // event loop
     while(1)
@@ -1057,27 +995,18 @@ int main(int argc, char** argv)
         t = glfwGetTime();
         main_loop();
 
-        fc++;
-        if(t > ltt)
-        {
-            timeTaken(0);
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] CPS: %u\n", strts, fc/32);
-            fc = 0;
-            ltt = t+32.0;
-        }
+        // fc++;
+        // if(t > ltt)
+        // {
+        //     timeTaken(0);
+        //     char strts[16];
+        //     timestamp(&strts[0]);
+        //     printf("[%s] CPS: %u\n", strts, fc/32);
+        //     fc = 0;
+        //     ltt = t+32.0;
+        // }
     }
 
-    // end
-    timeTaken(0);
-    char strts[16];
-    timestamp(&strts[0]);
-    printf("[%s] Game End.\n", strts);
-    printf("[%s] Porygon Collected: %u\n", strts, cp);
-    printf("[%s] Time-Taken: %s or %g Seconds\n\n", strts, tts, t-st);
-
     // done
-    exit(EXIT_SUCCESS);
     return 0;
 }
