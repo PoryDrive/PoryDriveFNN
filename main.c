@@ -170,7 +170,6 @@ uint auto_drive=0;
     f32 ad_maxspeed_reductor = 0.5f;
 uint neural_drive=0;
 uint dataset_logger=0;
-uint dataset_rows=0;
 
 // porygon vars
 vec zp; // position
@@ -1003,6 +1002,10 @@ void main_loop()
             }
             fclose(f);
         }
+        else
+        {
+            eskip = 1; // failed to even open the first file... skip the second
+        }
 
         // targets
         if(eskip == 0)
@@ -1035,9 +1038,6 @@ void main_loop()
                 fclose(f);
             }
         }
-
-        // increment counter
-        dataset_rows++;
     }
     
     // dataset logging
@@ -1312,7 +1312,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
             if(dataset_logger == 1)
             {
-                dataset_rows = 0;
                 char strts[16];
                 timestamp(&strts[0]);
                 printf("[%s] Dataset Logger: ON\n", strts);
@@ -1324,7 +1323,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 {
                     struct stat st;
                     stat("dataset_y.dat", &st);
-                    fprintf(f, "%u / %ld", dataset_rows, st.st_size/8);
+                    fprintf(f, "%ld", st.st_size/8);
                     fclose(f);
                 }
                 char strts[16];
