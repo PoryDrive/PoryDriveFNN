@@ -67,6 +67,9 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
+
 //#define uint GLushort
 #define sint short
 #define f32 float
@@ -571,9 +574,9 @@ void newGame(unsigned int seed)
     srand(urand());
     srandf(urand());
 
-    char strts[16];
-    timestamp(&strts[0]);
-    printf("[%s] Game Start [%u].\n", strts, seed);
+    // char strts[16];
+    // timestamp(&strts[0]);
+    // printf("[%s] Game Start [%u].\n", strts, seed);
     
     pp = (vec){0.f, 0.f, 0.f};
     pv = (vec){0.f, 0.f, 0.f};
@@ -924,59 +927,19 @@ void main_loop()
 //*************************************
 int main(int argc, char** argv)
 {
-    // allow custom msaa level
-    int msaa = 16;
-    if(argc == 2){msaa = atoi(argv[1]);}
-
     // help
     printf("----\n");
     printf("PoryDriveCli\n");
-    printf("----\n");
     printf("James William Fletcher (james@voxdsp.com)\n");
+    printf("This is the CLI trainer. No GFX. CPU Bound.\n");
     printf("----\n");
-    printf("There is only one command line argument, and that is the MSAA level 0-16.\n");
-    printf("----\n");
-    printf("~ Keyboard Input:\n");
-    printf("ESCAPE = Focus/Unfocus Mouse Look\n");
-    printf("F = FPS to console\n");
-    printf("P = Player stats to console\n");
-    printf("O = Toggle auto drive\n");
-    printf("I = Toggle neural drive\n");
-    printf("N = New Game\n");
-    printf("W = Drive Forward\n");
-    printf("A = Turn Left\n");
-    printf("S = Drive Backward\n");
-    printf("D = Turn Right\n");
-    printf("Space = Break\n");
-    printf("1-5 = Car Physics config selection (5 loads from file)\n");
-    printf("L = Toggle dataset logging\n");
-    printf("----\n");
-    printf("~ Mouse Input:\n");
-    printf("RIGHT/MOUSE4 = Zoom Snap Close/Ariel\n");
-    printf("Scroll = Zoom in/out\n");
-    printf("----\n");
-    printf("~ How to play:\n");
-    printf("Drive around and \"collect\" Porygon, each time you collect a Porygon a new one will randomly spawn somewhere on the map. A Porygon colliding with a purple cube will cause it to light up blue, this can help you find them. Upon right clicking the mouse you will switch between Ariel and Close views, in the Ariel view it is easier to see which of the purple cubes that the Porygon is colliding with.\n");
-    printf("----\n");
-    printf("~ Create custom car physics:\n");
-    printf("It is possible to tweak the car physics by creating a config.txt file in the exec/working directory of the game, here is an example of such config file with the default car phsyics variables.\n");
-    printf("~ config.txt:\n");
-    printf("maxspeed 0.0095\n");
-    printf("acceleration 0.0025\n");
-    printf("inertia 0.00015\n");
-    printf("drag 0.00038\n");
-    printf("steeringspeed 1.2\n");
-    printf("steerinertia 233\n");
-    printf("minsteer 0.32\n");
-    printf("maxsteer 0.55\n");
-    printf("steeringtransfer 0.023\n");
-    printf("steeringtransferinertia 280\n");
-    printf("----\n");
-
 
 //*************************************
 // execute update / render loop
 //*************************************
+
+    // screen refresh rate
+    const useconds_t wait = 1000000/144;
 
     // init
     configScarletFast();
@@ -991,7 +954,7 @@ int main(int argc, char** argv)
     // event loop
     while(1)
     {
-        usleep(1000000/144);
+        usleep(wait);
         t = glfwGetTime();
         main_loop();
 
