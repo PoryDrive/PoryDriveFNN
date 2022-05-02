@@ -32,7 +32,7 @@ inputsize = 6
 outputsize = 2
 training_iterations = 1
 activator = 'tanh'
-layer_units = 32
+layer_units = 64
 batches = 128
 
 # training set size
