@@ -1,6 +1,8 @@
 # PoryDriveFNN
 A Feed-Forward Neural Network trained by a classical autonomous AI.
 
+Focused on using Tensorflow Keras on Linux.
+
 This is forked from [mrbid/porydrive](https://github.com/mrbid/porydrive).
 
 I store all the trained models I liked in [/models](/models) numbered in order of when I trained them, generally higher numbers will be better models than the lower numbers - or at least that is what I think.
