@@ -110,6 +110,7 @@ vec pv; // velocity
 vec pd; // wheel direction
 vec pbd;// body direction
 f32 sp; // speed
+uint mcp;// max collected porygon count
 uint cp;// collected porygon count
 uint cc;// collision count
 double st=0; // start time
@@ -738,6 +739,13 @@ void main_loop()
         FILE* f = fopen("dataset_x.dat", "ab"); // append bytes
         if(f != NULL)
         {
+            if(flock(fileno(f), LOCK_EX) == -1)
+            {
+                fclose(f);
+                printf("File lock failed.\n");
+                eskip = 1;
+            }
+
             size_t r = 0;
             r += fwrite(&pbd.x, 1, sizeof(f32), f);
             r += fwrite(&pbd.y, 1, sizeof(f32), f);
@@ -757,6 +765,13 @@ void main_loop()
                 printf("Repaired.\n");
                 eskip = 1;
             }
+
+            if(flock(fileno(f), LOCK_UN) == -1)
+            {
+                fclose(f);
+                printf("File unlock failed.\n");
+            }
+
             fclose(f);
         }
         else
@@ -771,6 +786,19 @@ void main_loop()
             f = fopen("dataset_y.dat", "ab"); // append bytes
             if(f != NULL)
             {
+                if(flock(fileno(f), LOCK_EX) == -1)
+                {
+                    fclose(f);
+                    printf("File lock failed.\n");
+                    if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that
+                    {
+                        printf("Failed to revert X file. Exiting.\n");
+                        rename("dataset_x.dat", "dataset_x.dat_dirty");
+                        rename("dataset_y.dat", "dataset_y.dat_dirty");
+                        exit(0);
+                    }
+                }
+
                 size_t r = 0;
                 r += fwrite(&sr,  1, sizeof(f32), f);
                 r += fwrite(&sp,  1, sizeof(f32), f);
@@ -793,12 +821,19 @@ void main_loop()
                     }
                     printf("Repaired.\n");
                 }
+
+                if(flock(fileno(f), LOCK_UN) == -1)
+                {
+                    fclose(f);
+                    printf("File unlock failed.\n");
+                }
+
                 fclose(f);
             }
             else
             {
                 printf("Failed to fopen() Y file. Reverting X write.\n");
-                if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that too
+                if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that
                 {
                     printf("Failed to revert X file. Exiting.\n");
                     rename("dataset_x.dat", "dataset_x.dat_dirty");
@@ -881,6 +916,14 @@ void main_loop()
         if(dla1 < 0.04f || dla2 < 0.04f)
         {
             cp++;
+            if(cp >= mcp)
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] %u rounds completed, exiting...", strts, mcp);
+                exit(0);
+            }
+
             za = t+6.0;
 
             char strts[16];
@@ -938,6 +981,16 @@ int main(int argc, char** argv)
 // execute update / render loop
 //*************************************
 
+    // how many rounds to run for
+    mcp = 512;
+    if(argc == 2){mcp = atoi(argv[1]);}
+    printf("Running for %u rounds.\n----\n", mcp);
+
+    // i did consider threading this, and having a log buffer
+    // per thread that got aggregated by a logging thread
+    // but it was just easier to multi-process it
+    // and it's adequate.
+
     // screen refresh rate
     const useconds_t wait = 1000000/144;
 
@@ -948,8 +1001,8 @@ int main(int argc, char** argv)
     // reset
     t = glfwGetTime();
 
-    // double ltt = 0;
-    // uint fc = 0;
+    double ltt = 0;
+    uint fc = 0;
     
     // event loop
     while(1)
@@ -958,16 +1011,16 @@ int main(int argc, char** argv)
         t = glfwGetTime();
         main_loop();
 
-        // fc++;
-        // if(t > ltt)
-        // {
-        //     timeTaken(0);
-        //     char strts[16];
-        //     timestamp(&strts[0]);
-        //     printf("[%s] CPS: %u\n", strts, fc/32);
-        //     fc = 0;
-        //     ltt = t+32.0;
-        // }
+        fc++;
+        if(t > ltt)
+        {
+            timeTaken(0);
+            char strts[16];
+            timestamp(&strts[0]);
+            printf("[%s] CPS: %u\n", strts, fc/32);
+            fc = 0;
+            ltt = t+32.0;
+        }
     }
 
     // done

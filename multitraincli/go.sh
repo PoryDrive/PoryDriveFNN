@@ -1,0 +1,1 @@
+for i in {1..16}; do xterm -e "./porydrivecli" & done
