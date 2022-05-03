@@ -13,7 +13,7 @@ I have excluded the dataset files because they are huge, at the time of writing 
 
 It is much more efficient to make a dataset using [/multitraincli](/multitraincli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
-# input
+## input
 
 ### The input training data _(4-byte float32 per parameter)_
 - car normal dir x
