@@ -22,7 +22,7 @@ There is also an example script supplied [multitraincli/go.sh](multitraincli/go.
 
 ## nan
 
-I've created gigabytes of different datasets at the point using both [/multitraingui](/multitraingui) (GUI) and [/multitraincli](/multitraincli) (CLI) and this is what you need to know.
+I've created gigabytes of different datasets at this point using both [/multitraingui](/multitraingui) (GUI) and [/multitraincli](/multitraincli) (CLI) and this is what you need to know.
 
 I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NAN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
 
