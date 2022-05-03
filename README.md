@@ -23,7 +23,7 @@ It is much more efficient to make a dataset using [/multitraincli](/multitraincl
 - angle between both normal dir's _(Dot product)_
 - Euclidean distance between car and porygon
 
-### Training data targets _(one target per trained network)_
+### Training data targets
 - car steering angle
 - car speed
 
