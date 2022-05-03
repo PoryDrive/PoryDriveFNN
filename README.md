@@ -13,6 +13,20 @@ I have excluded the dataset files because they are huge, at the time of writing 
 
 It is much more efficient to make a dataset using [/multitraincli](/multitraincli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
+# input
+
+### The input training data _(4-byte float32 per parameter)_
+- car normal dir x
+- car normal dir y
+- (car_pos - porygon_pos) normal dir x
+- (car_pos - porygon_pos) normal dir y
+- angle between both normal dir's _(Dot product)_
+- Euclidean distance between car and porygon
+
+### Training data targets _(one target per trained network)_
+- car steering angle
+- car speed
+
 ## argv
 
 - The first command line parameter is the amount of rounds to execute, `cd multitraincli;./porydrive 8;`, for example, would execute one process for 8 rounds.
