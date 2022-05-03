@@ -1023,12 +1023,30 @@ void main_loop()
         if(f != NULL)
         {
             size_t r = 0;
-            r += fwrite(&pbd.x, 1, sizeof(f32), f);
-            r += fwrite(&pbd.y, 1, sizeof(f32), f);
-            r += fwrite(&lad.x, 1, sizeof(f32), f);
-            r += fwrite(&lad.y, 1, sizeof(f32), f);
-            r += fwrite(&angle, 1, sizeof(f32), f);
-            r += fwrite(&dist,  1, sizeof(f32), f);
+            if(isnorm(pbd.x) == 1)
+            {
+                r += fwrite(&pbd.x, 1, sizeof(f32), f);
+            }else{printf("pbd.x not isnorm()\n");}
+            if(isnorm(pbd.y) == 1)
+            {
+                r += fwrite(&pbd.y, 1, sizeof(f32), f);
+            }else{printf("pbd.y not isnorm()\n");}
+            if(isnorm(lad.x) == 1)
+            {
+                r += fwrite(&lad.x, 1, sizeof(f32), f);
+            }else{printf("lad.x not isnorm()\n");}
+            if(isnorm(lad.y) == 1)
+            {
+                r += fwrite(&lad.y, 1, sizeof(f32), f);
+            }else{printf("lad.y not isnorm()\n");}
+            if(isnorm(angle) == 1)
+            {
+                r += fwrite(&angle, 1, sizeof(f32), f);
+            }else{printf("angle not isnorm()\n");}
+            if(isnorm(dist) == 1)
+            {
+                r += fwrite(&dist,  1, sizeof(f32), f);
+            }else{printf("dist not isnorm()\n");}
             if(r != 24)
             {
                 printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes).\n", r);
@@ -1056,8 +1074,14 @@ void main_loop()
             if(f != NULL)
             {
                 size_t r = 0;
-                r += fwrite(&sr,  1, sizeof(f32), f);
-                r += fwrite(&sp,  1, sizeof(f32), f);
+                if(isnorm(sr) == 1)
+                {
+                    r += fwrite(&sr,  1, sizeof(f32), f);
+                }else{printf("sr not isnorm()\n");}
+                if(isnorm(sp) == 1)
+                {
+                    r += fwrite(&sp,  1, sizeof(f32), f);
+                }else{printf("sp not isnorm()\n");}
                 if(r != 8)
                 {
                     printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
