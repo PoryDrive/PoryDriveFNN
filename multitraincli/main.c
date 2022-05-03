@@ -530,9 +530,9 @@ void main_loop()
 //*************************************
 // time delta for interpolation
 //*************************************
-    static double lt = 0;
-    dt = t-lt;
-    lt = t;
+    // static double lt = 0;
+    // dt = t-lt;
+    // lt = t;
 
 //*************************************
 // update stats
@@ -902,9 +902,13 @@ int main(int argc, char** argv)
     // reset
     const double st = glfwGetTime();
     t = glfwGetTime();
+    dt = 1.0 / 144.0; // fixed timestep delta-time
 
-    double ltt = 0;
+    // "framerate" or Cycles Per Second (CPS) monitoring
+    double ltt = t+32.0;
     uint fc = 0;
+    double ltt2 = t+1.0;
+    uint fc2 = 0;
     
     // event loop
     while(1)
@@ -913,10 +917,25 @@ int main(int argc, char** argv)
         t = glfwGetTime();
         main_loop();
 
+        // if CPS drops below 120, quit! bad data!!
+        fc2++;
+        if(t > ltt2)
+        {
+            if(fc2 < 120)
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] CPS dropped to unacceptable level: %u\n", strts, fc2);
+                exit(0);
+            }
+            fc2 = 0;
+            ltt2 = t+1.0;
+        }
+
+        // user cycles per second counter
         fc++;
         if(t > ltt)
         {
-            timeTaken(0);
             char strts[16];
             timestamp(&strts[0]);
             printf("[%s] CPS: %u\n", strts, fc/32);
