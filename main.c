@@ -843,9 +843,9 @@ void main_loop()
 //*************************************
 // time delta for interpolation
 //*************************************
-    static double lt = 0;
-    dt = t-lt;
-    lt = t;
+    // static double lt = 0;
+    // dt = t-lt;
+    // lt = t;
 
 //*************************************
 // keystates
@@ -1609,6 +1609,7 @@ int main(int argc, char** argv)
     // reset
     t = glfwGetTime();
     lfct = t;
+    dt = 1.0 / 144.0; // fixed timestep delta-time
     
     // efficient event loop
     const useconds_t wait = 1000000 / 144;
