@@ -811,6 +811,14 @@ void newGame(unsigned int seed)
     zt = 8.f;
 }
 
+void randAutoDrive()
+{
+    ad_min_dstep = uRandFloat(0.01f, 0.03f);
+    ad_max_dstep = uRandFloat(0.03f, 0.09f);
+    ad_min_speedswitch = uRandFloat(2.f, 4.f);
+    ad_maxspeed_reductor = uRandFloat(0.1f, 0.5f);
+}
+
 void randGame()
 {
     const uint seed = urand();
@@ -821,10 +829,7 @@ void randGame()
     zt = uRandFloat(8.f, 16.f);
     za = 0.0;
 
-    ad_min_dstep = uRandFloat(0.01f, 0.03f);
-    ad_max_dstep = uRandFloat(0.03f, 0.09f);
-    ad_min_speedswitch = uRandFloat(2.f, 4.f);
-    ad_maxspeed_reductor = uRandFloat(0.1f, 0.5f);
+    // randAutoDrive();
 
     auto_drive = 1;
     dataset_logger = 1;
@@ -1169,10 +1174,7 @@ void main_loop()
         zt = uRandFloat(8.f, 16.f);
         za = 0.0;
 
-        ad_min_dstep = uRandFloat(0.01f, 0.03f);
-        ad_max_dstep = uRandFloat(0.03f, 0.09f);
-        ad_min_speedswitch = uRandFloat(2.f, 4.f);
-        ad_maxspeed_reductor = uRandFloat(0.1f, 0.5f);
+        // randAutoDrive();
     }
 
 //*************************************
