@@ -840,6 +840,13 @@ void randGame()
     printf("\n[%s] Rand Game Start [%u], DATASET LOGGER & AUTO DRIVE ON.\n", strts, seed);
 }
 
+static inline uint isnorm(const f32 f)
+{
+    if(isnormal(f) == 1 || f == 0.f)
+        return 1;
+    return 0;
+}
+
 //*************************************
 // update & render
 //*************************************
@@ -988,7 +995,7 @@ void main_loop()
                 // if(ret[1] > 1.f){ret[1] = 1.f;}
                 //printf("%f %f %u %u\n", ret[0], ret[1], isnormal(ret[0]), isnormal(ret[1]));
 
-                if(isnormal(ret[0]) == 1 && isnormal(ret[1]) == 1)
+                if(isnorm(ret[0]) == 1 && isnorm(ret[1]) == 1)
                 {
                     // set new vars
                     sr = ret[0];
