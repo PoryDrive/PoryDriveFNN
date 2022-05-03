@@ -15,7 +15,7 @@ It is much more efficient to make a dataset using [/multitraincli](/multitraincl
 
 ## input
 
-### The input training data _(4-byte float32 per parameter)_
+### Input training data _(4-byte float32 per parameter)_
 - car normal dir x
 - car normal dir y
 - (car_pos - porygon_pos) normal dir x
