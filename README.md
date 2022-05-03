@@ -15,7 +15,7 @@ It is much more efficient to make a dataset using [/multitraincli](/multitraincl
 
 ## input
 
-### Input training data _(4-byte float32 per parameter)_
+#### Input training data _(4-byte float32 per parameter)_
 - car normal dir x
 - car normal dir y
 - (car_pos - porygon_pos) normal dir x
@@ -23,7 +23,7 @@ It is much more efficient to make a dataset using [/multitraincli](/multitraincl
 - angle between both normal dir's _(Dot product)_
 - Euclidean distance between car and porygon
 
-### Training data targets
+#### Training data targets
 - car steering angle
 - car speed
 
