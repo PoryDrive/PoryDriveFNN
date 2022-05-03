@@ -981,9 +981,9 @@ void main_loop()
                 // if(ret[0] > 1.f){ret[0] = 1.f;}
                 // if(ret[1] < -1.f){ret[1] = -1.f;}
                 // if(ret[1] > 1.f){ret[1] = 1.f;}
-                //printf("%f %f %u %u\n", ret[0], ret[1], isnan(ret[0]), isnan(ret[1]));
+                //printf("%f %f %u %u\n", ret[0], ret[1], isnormal(ret[0]), isnormal(ret[1]));
 
-                if(isnan(ret[0]) == 0 && isnan(ret[1]) == 0)
+                if(isnormal(ret[0]) == 1 && isnormal(ret[1]) == 1)
                 {
                     // set new vars
                     sr = ret[0];
