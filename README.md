@@ -27,8 +27,8 @@ I've created gigabytes of different datasets at this point using both [/multitra
 I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
 
 The main difference between CLI and GUI dataset aggregation:
-- **GUI** - ~1GB dataset takes 10 hours using 10 processes running simultaneously.
-- **CLI** - ~1GB dataset takes 10 minutes using 600 processes running simultaneously.
+- **GUI:** ~1GB dataset takes 10 hours using 10 processes running simultaneously.
+- **CLI:** ~1GB dataset takes 10 minutes using 600 processes running simultaneously.
 
 It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
 
