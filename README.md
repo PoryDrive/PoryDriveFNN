@@ -15,3 +15,5 @@ It is much more efficient to make a dataset using [/multitraincli](/multitraincl
 - The second command line parameter is the amount of seconds before the process times out, e.g 8 rounds and timeout after 33 seconds, `cd multitraincli;./porydrive 8 33;`.
 
 There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh).
+
+**WARNING:** It would seem that `multitraincli` is currently producing large datasets that produce nans, this doesn't seem right as `multitraingui` albeit slower doesn't seem to be doing this for similar sized datasets. I've not worked out why yet.
