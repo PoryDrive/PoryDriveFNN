@@ -653,12 +653,18 @@ void main_loop()
             }
 
             size_t r = 0;
-            r += fwrite(&pbd.x, 1, sizeof(f32), f);
-            r += fwrite(&pbd.y, 1, sizeof(f32), f);
-            r += fwrite(&lad.x, 1, sizeof(f32), f);
-            r += fwrite(&lad.y, 1, sizeof(f32), f);
-            r += fwrite(&angle, 1, sizeof(f32), f);
-            r += fwrite(&dist,  1, sizeof(f32), f);
+            if(isnormal(pbd.x) == 1)
+                r += fwrite(&pbd.x, 1, sizeof(f32), f);
+            if(isnormal(pbd.y) == 1)
+                r += fwrite(&pbd.y, 1, sizeof(f32), f);
+            if(isnormal(lad.x) == 1)
+                r += fwrite(&lad.x, 1, sizeof(f32), f);
+            if(isnormal(lad.y) == 1)
+                r += fwrite(&lad.y, 1, sizeof(f32), f);
+            if(isnormal(angle) == 1)
+                r += fwrite(&angle, 1, sizeof(f32), f);
+            if(isnormal(dist) == 1)
+                r += fwrite(&dist,  1, sizeof(f32), f);
             if(r != 24)
             {
                 printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes).\n", r);
@@ -706,8 +712,10 @@ void main_loop()
                 }
 
                 size_t r = 0;
-                r += fwrite(&sr,  1, sizeof(f32), f);
-                r += fwrite(&sp,  1, sizeof(f32), f);
+                if(isnormal(sr) == 1)
+                    r += fwrite(&sr,  1, sizeof(f32), f);
+                if(isnormal(sp) == 1)
+                    r += fwrite(&sp,  1, sizeof(f32), f);
                 if(r != 8)
                 {
                     printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
