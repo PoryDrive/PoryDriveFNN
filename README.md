@@ -30,6 +30,6 @@ The main difference between CLI and GUI dataset aggregation:
 - **GUI** - 1GB dataset takes 10 hours using 10 processes running simultaneously.
 - **CLI** - 1GB dataset takes 10 minutes using 512 processes running simultaneously.
 
-It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no commuication with a Graphics Processing Unit (GPU).
+It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
 
 It's just worth keeping this in mind if you dataset starts producing a NAN loss when training with it. I am not completely sure why this is yet, I am checking that the CLI processes do not write NAN floats to the dataset, I check for any write corruption to the extent that I can in real-time which is just that the number of bytes written is correct. It is possible that the high frequency and resource demanding nature of the CLI processes all running at once could be causing bytes to be miss-written to file creating NAN's in the dataset, checking the bytes after writing them could detect this and is an option that comes at a cost to performance but one I will probably be adding.
