@@ -136,6 +136,7 @@ GLuint mdlBlueCubeColors;
 ESModel mdlPorygon;
 ESModel mdlDNA;
 ESModel mdlBody;
+GLuint mdlBodyColors2;
 ESModel mdlWindows;
 ESModel mdlWheel;
 
@@ -162,6 +163,7 @@ uint cp;// collected porygon count
 uint cc;// collision count
 double st=0; // start time
 char tts[32];// time taken string
+f32 pc = 0.f;// is player colliding
 
 // ai/ml
 uint auto_drive=0;
@@ -443,6 +445,28 @@ __attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // C co
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdl->iid);
 }
 
+void iterBody()
+{
+    // so that you don't get confused I am exploiting the
+    // fact that when a colour channel goes into minus
+    // figures very strange things begin to happen to the
+    // gradient between triangle verticies.
+    static const uint mi = body_numvert*3;
+    static f32 cd = 1.f;
+    for(uint i = 0; i < mi; i++) // lavalamp it
+    {
+        body_colors2[i] += fRandFloat(0.1f, 0.6f) * cd;
+
+        // and this piece of code prevents it looking like a random mess,
+        // gives some structure. This is the lava lamper.
+        if(body_colors2[i] >= 1.f)
+            cd = -1.f;
+        else if(body_colors2[i] <= 0.f)
+            cd = 1.f;
+    }
+    esRebind(GL_ARRAY_BUFFER, &mdlBodyColors2, body_colors2, sizeof(body_colors2), GL_STATIC_DRAW);
+}
+
 void iterDNA()
 {
     // so that you don't get confused I am exploiting the
@@ -463,6 +487,8 @@ void iterDNA()
             cd = 1.f;
     }
     esRebind(GL_ARRAY_BUFFER, &mdlDNA.cid, dna_colors, sizeof(dna_colors), GL_STATIC_DRAW);
+
+    iterBody();
 }
 
 void rCube(f32 x, f32 y)
@@ -554,6 +580,7 @@ void rCube(f32 x, f32 y)
     // check to see if cube needs to be blue
     const f32 dla = vDist(pp, (vec){x, y, 0.f}); // worth it to prevent the flicker
 
+    // official colliding count
     static f32 colliding = 0.f;
     if(dla <= 0.13f)
     {
@@ -570,6 +597,24 @@ void rCube(f32 x, f32 y)
     else if(x*y+x == colliding)
     {
         colliding = 0.f;
+    }
+
+    // player colliding
+    if(dla <= 0.17f)
+    {
+        if(pc == 0.f)
+        {
+            pc = x*y+x;
+            cc++;
+
+            // char strts[16];
+            // timestamp(&strts[0]);
+            // printf("[%s] Collisions: %u\n", strts, cc);
+        }
+    }
+    else if(x*y+x == pc)
+    {
+        pc = 0.f;
     }
 
     const uint collision = (dla < 0.17f || dlap < 0.16f);
@@ -759,9 +804,38 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 
     modelBind(&mdlBody);
 
-    glDisable(GL_CULL_FACE);
-    glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
-    glEnable(GL_CULL_FACE);
+    if(pc == 0.f && cp > 0)
+    {
+        glDisable(GL_CULL_FACE);
+        glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
+        glEnable(GL_CULL_FACE);
+    }
+    else
+    {
+        if(cp == 0)
+        {
+            glDisable(GL_CULL_FACE);
+            glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            if(cp > 1)
+            {
+                glDisable(GL_CULL_FACE);
+                glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
+                glEnable(GL_CULL_FACE);
+
+                glBindBuffer(GL_ARRAY_BUFFER, mdlBodyColors2);
+                glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+                glEnableVertexAttribArray(color_id);
+            }
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+    }
 
     // transparent
     glUniform1f(opacity_id, 0.3f);
@@ -1574,6 +1648,7 @@ int main(int argc, char** argv)
     esBind(GL_ARRAY_BUFFER, &mdlBody.nid, body_normals, sizeof(body_normals), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlBody.iid, body_indices, sizeof(body_indices), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlBody.cid, body_colors, sizeof(body_colors), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlBodyColors2, body_colors2, sizeof(body_colors2), GL_STATIC_DRAW);
 
     // ***** BIND WINDOWS *****
     esBind(GL_ARRAY_BUFFER, &mdlWindows.vid, windows_vertices, sizeof(windows_vertices), GL_STATIC_DRAW);
