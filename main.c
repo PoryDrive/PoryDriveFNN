@@ -1007,9 +1007,9 @@ void main_loop()
 
     if(keystate[0] == 0 && keystate[1] == 0)
     {
-        if(sr > 0.006f)
+        if(sr > 0.013f)
             sr -= steeringspeed * dt;
-        else if(sr < -0.006f)
+        else if(sr < -0.013f)
             sr += steeringspeed * dt;
         else
             sr = 0.f;
