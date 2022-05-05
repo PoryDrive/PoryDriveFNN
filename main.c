@@ -1798,7 +1798,7 @@ int main(int argc, char** argv)
             if(t > rlim)
             {
                 RENDER_PASS = 1;
-                rlim = t + fps_limit; // should be doing this after main_loop at the very least but it's not a big deal.
+                rlim = t + fps_limit; // should be doing this after main_loop() at the very least but it's not a big deal.
                 fc++;
             }
             else
