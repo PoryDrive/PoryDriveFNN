@@ -316,6 +316,12 @@ int forceTrim(const char* file, const size_t trim)
     int f = open(file, O_WRONLY);
     if(f > -1)
     {
+        if(flock(f, LOCK_EX) == -1)
+        {
+            close(f);
+            printf("forceTrim() File lock failed.\n");
+        }
+
         const size_t len = lseek(f, 0, SEEK_END);
 
         uint c = 0;
@@ -326,6 +332,12 @@ int forceTrim(const char* file, const size_t trim)
             c++;
             if(c > 333)
                 return -2;
+        }
+
+        if(flock(f, LOCK_UN) == -1)
+        {
+            close(f);
+            printf("forceTrim() File unlock failed.\n");
         }
 
         close(f);
