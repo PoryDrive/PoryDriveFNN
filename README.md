@@ -34,14 +34,9 @@ It is much more efficient to make a dataset using [/multitraincli](/multitraincl
 - Second command line FPS limit
 - Third command line "datalogger mode toggle".
 
-Porydrive at 16 MSAA and 144 FPS
-`./porydrive 16 144`
-
-Porydrive at 0 MSAA and 60 FPS
-`./porydrive 0 60`
-
-Porydrive in datalogging mode
-`./porydrive 0 0 1`
+Porydrive at 16 MSAA and 144 FPS: `./porydrive 16 144`
+Porydrive at 0 MSAA and 60 FPS:   `./porydrive 0 60`
+Porydrive in datalogging mode:    `./porydrive 0 0 1`
 
 #### porydrivecli
 - The first command line parameter is the amount of rounds to execute, `cd multitraincli;./porydrive 8;`, for example, would execute one process for 8 rounds.
