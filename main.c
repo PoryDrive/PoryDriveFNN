@@ -1793,10 +1793,8 @@ int main(int argc, char** argv)
         t = glfwGetTime();
         glfwPollEvents();
 
-        //printf("%f %f %f\n", maxfps, t, rlim);
         if(maxfps < 144.0)
         {
-            //printf("%f %f\n", t, rlim);
             if(t > rlim)
             {
                 RENDER_PASS = 1;
@@ -1846,7 +1844,7 @@ int main(int argc, char** argv)
 
     //     main_loop();
 
-    //     //accurate fps or lps, not both
+    //     // accurate fps
     //     if(RENDER_PASS == 1)
     //     {
     //         rlim = t + fps_limit - (glfwGetTime() - t);
