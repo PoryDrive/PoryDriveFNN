@@ -8,6 +8,9 @@
 
         This version is targeted at just Tensorflow Keras training.
 
+        Logic is set to run at 144 times per second and the frames per second
+        can be set to anything below that.
+
 
     Keyboard:
 
@@ -143,6 +146,7 @@ ESModel mdlWheel;
 // game vars
 #define FAR_DISTANCE 1000.f
 #define NEWGAME_SEED 1337
+uint RENDER_PASS = 0;
 
 // camera vars
 uint focus_cursor = 1;
@@ -493,29 +497,32 @@ void iterDNA()
 
 void rCube(f32 x, f32 y)
 {
-    mIdent(&model);
-    mTranslate(&model, x, y, 0.f);
-    mMul(&modelview, &model, &view);
-
-    glUniform1f(opacity_id, 1.0f);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    if(bindstate != 1)
+    if(RENDER_PASS == 1)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.vid);
-        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(position_id);
+        mIdent(&model);
+        mTranslate(&model, x, y, 0.f);
+        mMul(&modelview, &model, &view);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.nid);
-        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(normal_id);
+        glUniform1f(opacity_id, 1.0f);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPurpleCube.iid);
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        if(bindstate != 1)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.vid);
+            glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(position_id);
 
-        bindstate = 1;
-        bindstate2 = -1;
+            glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.nid);
+            glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(normal_id);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPurpleCube.iid);
+
+            bindstate = 1;
+            bindstate2 = -1;
+        }
     }
 
     // cube collisions
@@ -599,220 +606,233 @@ void rCube(f32 x, f32 y)
         colliding = 0.f;
     }
 
-    // player colliding
-    if(dla <= 0.17f)
+    if(RENDER_PASS == 1)
     {
-        if(pc == 0.f)
+        // player colliding
+        if(dla <= 0.17f)
         {
-            pc = x*y+x;
-            cc++;
+            if(pc == 0.f)
+            {
+                pc = x*y+x;
+                cc++;
 
-            // char strts[16];
-            // timestamp(&strts[0]);
-            // printf("[%s] Collisions: %u\n", strts, cc);
+                // char strts[16];
+                // timestamp(&strts[0]);
+                // printf("[%s] Collisions: %u\n", strts, cc);
+            }
         }
-    }
-    else if(x*y+x == pc)
-    {
-        pc = 0.f;
-    }
+        else if(x*y+x == pc)
+        {
+            pc = 0.f;
+        }
 
-    const uint collision = (dla < 0.17f || dlap < 0.16f);
-    if(collision == 1 && bindstate2 <= 1)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCubeColors);
-        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(color_id);
-        bindstate2 = 2;
-    }
-    else if(collision == 0 && bindstate2 != 1)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.cid);
-        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(color_id);
-        bindstate2 = 1;
-    }
+        const uint collision = (dla < 0.17f || dlap < 0.16f);
+        if(collision == 1 && bindstate2 <= 1)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCubeColors);
+            glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(color_id);
+            bindstate2 = 2;
+        }
+        else if(collision == 0 && bindstate2 != 1)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.cid);
+            glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(color_id);
+            bindstate2 = 1;
+        }
 
-    glDrawElements(GL_TRIANGLES, purplecube_numind, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, purplecube_numind, GL_UNSIGNED_SHORT, 0);
+    }
 }
 
 void rPorygon(f32 x, f32 y, f32 r)
 {
-    bindstate = -1;
+    if(RENDER_PASS == 1)
+    {
+        bindstate = -1;
 
-    mIdent(&model);
-    mTranslate(&model, x, y, 0.f);
-    mRotZ(&model, r);
+        mIdent(&model);
+        mTranslate(&model, x, y, 0.f);
+        mRotZ(&model, r);
 
-    if(za != 0.0)
-        mScale(&model, 1.f, 1.f, 0.1f);
+        if(za != 0.0)
+            mScale(&model, 1.f, 1.f, 0.1f);
 
-    mMul(&modelview, &model, &view);
+        mMul(&modelview, &model, &view);
 
-    // returns direction
-    mGetDirY(&zd, model);
-    vInv(&zd);
+        // returns direction
+        mGetDirY(&zd, model);
+        vInv(&zd);
 
-    if(za != 0.0)
-        glUniform1f(opacity_id, (za-t)/6.0);
+        if(za != 0.0)
+            glUniform1f(opacity_id, (za-t)/6.0);
+        else
+            glUniform1f(opacity_id, 1.0f);
+
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+
+        modelBind(&mdlPorygon);
+
+        if(za != 0.0)
+            glEnable(GL_BLEND);
+        glDrawElements(GL_TRIANGLES, porygon_numind, GL_UNSIGNED_SHORT, 0);
+        if(za != 0.0)
+            glDisable(GL_BLEND);
+    }
     else
-        glUniform1f(opacity_id, 1.0f);
+    {
+        mIdent(&model);
+        mTranslate(&model, x, y, 0.f);
+        mRotZ(&model, r);
 
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-
-    modelBind(&mdlPorygon);
-
-    if(za != 0.0)
-        glEnable(GL_BLEND);
-    glDrawElements(GL_TRIANGLES, porygon_numind, GL_UNSIGNED_SHORT, 0);
-    if(za != 0.0)
-        glDisable(GL_BLEND);
+        // returns direction
+        mGetDirY(&zd, model);
+        vInv(&zd);
+    }
 }
 
 void rDNA(f32 x, f32 y, f32 z)
 {
-    bindstate = -1;
-
     static f32 dr = 0.f;
     dr += 1.f * dt;
 
-    mIdent(&model);
-    mTranslate(&model, x, y, z);
-    mRotZ(&model, dr);
-    mMul(&modelview, &model, &view);
+    if(RENDER_PASS == 1)
+    {
+        bindstate = -1;
 
-    glUniform1f(opacity_id, 1.0f);
+        mIdent(&model);
+        mTranslate(&model, x, y, z);
+        mRotZ(&model, dr);
+        mMul(&modelview, &model, &view);
 
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlDNA);
+        glUniform1f(opacity_id, 1.0f);
 
-    glDrawElements(GL_TRIANGLES, dna_numind, GL_UNSIGNED_SHORT, 0);
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        modelBind(&mdlDNA);
+
+        glDrawElements(GL_TRIANGLES, dna_numind, GL_UNSIGNED_SHORT, 0);
+    }
 }
 
 void rCar(f32 x, f32 y, f32 z, f32 rx)
 {
-    bindstate = -1;
-
-    // opaque
-    glUniform1f(opacity_id, 1.0f);
-
-    // wheel spin speed
-    static f32 wr = 0.f;
-    const f32 speed = sp * 33.f;
-    if(sp > inertia || sp < -inertia)
-        wr += speed;
-
-    // wheel; front left
-    mIdent(&model);
-    mTranslate(&model, x, y, z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, -0.054417f, 0.012185f);
-    mRotZ(&model, sr);
-
-    // returns direction
-    mGetDirY(&pd, model);
-    vInv(&pd);
-
-    mRotY(&model, -wr);
-    mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
-
-    // wheel; back left
-
-    mIdent(&model);
-    mTranslate(&model, x, y, z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, 0.045294f, 0.012185f);
-    mRotY(&model, -wr);
-    mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
-
-    // wheel; front right
-
-    mIdent(&model);
-    mRotZ(&model, PI);
-    mTranslate(&model, -x, -y, -z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, 0.054417f, 0.012185f);
-    mRotZ(&model, sr);
-    mRotY(&model, wr);
-    mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
-
-    // wheel; back right
-
-    mIdent(&model);
-    mRotZ(&model, PI);
-    mTranslate(&model, -x, -y, -z);
-    mRotZ(&model, -rx);
-    mTranslate(&model, 0.026343f, -0.045294f, 0.012185f);
-    mRotY(&model, wr);
-    mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    modelBind(&mdlWheel);
-
-    glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
-
-    // body & window matrix
-
-    mIdent(&model);
-    mTranslate(&model, x, y, z);
-    mRotZ(&model, -rx);
-
-    // returns direction
-    mGetDirY(&pbd, model);
-    vInv(&pbd);
-
-    f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
-    if(sy > 0.03f){sy = 0.03f;}
-    if(sy < -0.03f){sy = -0.03f;}
-    mRotY(&model, sy);
-    f32 sx = sr*30.f*sp; // turning suspension
-    // if(sx > 0.03f){sx = 0.03f;}
-    // if(sx < -0.03f){sx = -0.03f;}
-    mRotX(&model, sx);
-    mMul(&modelview, &model, &view);
-
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    // body
-
-    modelBind(&mdlBody);
-
-    if(pc == 0.f && cp > 0)
+    if(RENDER_PASS == 1)
     {
-        glDisable(GL_CULL_FACE);
-        glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
-        glEnable(GL_CULL_FACE);
-    }
-    else
-    {
-        if(cp == 0)
+        bindstate = -1;
+
+        // opaque
+        glUniform1f(opacity_id, 1.0f);
+
+        // wheel spin speed
+        static f32 wr = 0.f;
+        const f32 speed = sp * 33.f;
+        if(sp > inertia || sp < -inertia)
+            wr += speed;
+
+        // wheel; front left
+        mIdent(&model);
+        mTranslate(&model, x, y, z);
+        mRotZ(&model, -rx);
+        mTranslate(&model, 0.026343f, -0.054417f, 0.012185f);
+        mRotZ(&model, sr);
+
+        // returns direction
+        mGetDirY(&pd, model);
+        vInv(&pd);
+
+        mRotY(&model, -wr);
+        mMul(&modelview, &model, &view);
+
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        modelBind(&mdlWheel);
+
+        glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
+
+        // wheel; back left
+
+        mIdent(&model);
+        mTranslate(&model, x, y, z);
+        mRotZ(&model, -rx);
+        mTranslate(&model, 0.026343f, 0.045294f, 0.012185f);
+        mRotY(&model, -wr);
+        mMul(&modelview, &model, &view);
+
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        modelBind(&mdlWheel);
+
+        glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
+
+        // wheel; front right
+
+        mIdent(&model);
+        mRotZ(&model, PI);
+        mTranslate(&model, -x, -y, -z);
+        mRotZ(&model, -rx);
+        mTranslate(&model, 0.026343f, 0.054417f, 0.012185f);
+        mRotZ(&model, sr);
+        mRotY(&model, wr);
+        mMul(&modelview, &model, &view);
+
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        modelBind(&mdlWheel);
+
+        glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
+
+        // wheel; back right
+
+        mIdent(&model);
+        mRotZ(&model, PI);
+        mTranslate(&model, -x, -y, -z);
+        mRotZ(&model, -rx);
+        mTranslate(&model, 0.026343f, -0.045294f, 0.012185f);
+        mRotY(&model, wr);
+        mMul(&modelview, &model, &view);
+
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        modelBind(&mdlWheel);
+
+        glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
+
+        // body & window matrix
+
+        mIdent(&model);
+        mTranslate(&model, x, y, z);
+        mRotZ(&model, -rx);
+
+        // returns direction
+        mGetDirY(&pbd, model);
+        vInv(&pbd);
+
+        f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
+        if(sy > 0.03f){sy = 0.03f;}
+        if(sy < -0.03f){sy = -0.03f;}
+        mRotY(&model, sy);
+        f32 sx = sr*30.f*sp; // turning suspension
+        // if(sx > 0.03f){sx = 0.03f;}
+        // if(sx < -0.03f){sx = -0.03f;}
+        mRotX(&model, sx);
+        mMul(&modelview, &model, &view);
+
+        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+        
+        // body
+
+        modelBind(&mdlBody);
+
+        if(pc == 0.f && cp > 0)
         {
             glDisable(GL_CULL_FACE);
             glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
@@ -820,35 +840,73 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         }
         else
         {
-            if(cp > 1)
+            if(cp == 0)
             {
                 glDisable(GL_CULL_FACE);
                 glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
                 glEnable(GL_CULL_FACE);
-
-                glBindBuffer(GL_ARRAY_BUFFER, mdlBodyColors2);
-                glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-                glEnableVertexAttribArray(color_id);
             }
+            else
+            {
+                if(cp > 1)
+                {
+                    glDisable(GL_CULL_FACE);
+                    glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
+                    glEnable(GL_CULL_FACE);
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                    glBindBuffer(GL_ARRAY_BUFFER, mdlBodyColors2);
+                    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+                    glEnableVertexAttribArray(color_id);
+                }
+
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
         }
+
+        // transparent
+        glUniform1f(opacity_id, 0.3f);
+
+        // windows
+
+        modelBind(&mdlWindows);
+
+        glEnable(GL_BLEND);
+        glDepthMask(GL_FALSE);
+        glDrawElements(GL_TRIANGLES, windows_numind, GL_UNSIGNED_SHORT, 0);
+        glDisable(GL_BLEND);
+        glDepthMask(GL_TRUE);
     }
+    else
+    {
+        // wheel spin speed
+        static f32 wr = 0.f;
+        const f32 speed = sp * 33.f;
+        if(sp > inertia || sp < -inertia)
+            wr += speed;
 
-    // transparent
-    glUniform1f(opacity_id, 0.3f);
+        // wheel; front left
+        mIdent(&model);
+        mTranslate(&model, x, y, z);
+        mRotZ(&model, -rx);
+        mTranslate(&model, 0.026343f, -0.054417f, 0.012185f);
+        mRotZ(&model, sr);
 
-    // windows
+        // returns direction
+        mGetDirY(&pd, model);
+        vInv(&pd);
 
-    modelBind(&mdlWindows);
+        // body & window matrix
 
-    glEnable(GL_BLEND);
-    glDepthMask(GL_FALSE);
-    glDrawElements(GL_TRIANGLES, windows_numind, GL_UNSIGNED_SHORT, 0);
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
+        mIdent(&model);
+        mTranslate(&model, x, y, z);
+        mRotZ(&model, -rx);
+
+        // returns direction
+        mGetDirY(&pbd, model);
+        vInv(&pbd);
+    }
 }
 
 //*************************************
@@ -904,6 +962,7 @@ void randGame()
     za = 0.0;
 
     // randAutoDrive();
+    configScarletFast();
 
     auto_drive = 1;
     dataset_logger = 1;
@@ -1310,7 +1369,8 @@ void main_loop()
 //*************************************
 // begin render
 //*************************************
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if(RENDER_PASS == 1)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 //*************************************
 // main render
@@ -1335,7 +1395,8 @@ void main_loop()
 //*************************************
 // swap buffers / display render
 //*************************************
-    glfwSwapBuffers(window);
+    if(RENDER_PASS == 1)
+        glfwSwapBuffers(window);
 }
 
 //*************************************
@@ -1551,11 +1612,15 @@ int main(int argc, char** argv)
 {
     // allow custom msaa level
     int msaa = 16;
-    if(argc == 2){msaa = atoi(argv[1]);}
+    if(argc >= 2){msaa = atoi(argv[1]);}
+
+    // allow framerate cap
+    double maxfps = 144.0;
+    if(argc >= 3){maxfps = atof(argv[2]);}
 
     // trigger special mode
-    if(argc == 3)
-        winw = 420, winh = 240, msaa = 0;
+    if(argc == 4)
+        winw = 420, winh = 240, msaa = 0, maxfps = 10.0, RENDER_PASS = 0;
 
     // help
     printf("----\n");
@@ -1709,7 +1774,7 @@ int main(int argc, char** argv)
     // init
     configScarlet();
     loadConfig(0);
-    if(argc == 3)
+    if(argc == 4)
         randGame();
     else
         newGame(NEWGAME_SEED);
@@ -1720,14 +1785,27 @@ int main(int argc, char** argv)
     dt = 1.0 / 144.0; // fixed timestep delta-time
     
     // efficient event loop
+    const double fps_limit = 1.0 / maxfps;
+    double rlim = 0.f;
     const useconds_t wait = 1000000 / 144;
     while(!glfwWindowShouldClose(window))
     {
         usleep(wait);
         t = glfwGetTime();
         glfwPollEvents();
-        main_loop();
-        fc++;
+
+        if(maxfps <= 144.0)
+        {
+            if(t > rlim)
+            {
+                RENDER_PASS = 1;
+                rlim = t + fps_limit;
+                fc++;
+            }
+            else{RENDER_PASS = 0;}
+        }
+
+        main_loop();   
     }
 
     // accurate event loop

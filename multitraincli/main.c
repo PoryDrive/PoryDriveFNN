@@ -341,10 +341,6 @@ int forceTrim(const char* file, const size_t trim)
 
 void rCube(f32 x, f32 y)
 {
-    mIdent(&model);
-    mTranslate(&model, x, y, 0.f);
-    mMul(&modelview, &model, &view);
-
     // cube collisions
     const f32 dlap = vDistLa(zp, (vec){x, y, 0.f}); // porygon
     if(dlap < 0.15f)
@@ -404,9 +400,8 @@ void rCube(f32 x, f32 y)
         }
     }
 
-    // check to see if cube needs to be blue
-    const f32 dla = vDist(pp, (vec){x, y, 0.f}); // worth it to prevent the flicker
-
+    // official colliding count
+    const f32 dla = vDist(pp, (vec){x, y, 0.f});
     static f32 colliding = 0.f;
     if(dla <= 0.13f)
     {
@@ -431,11 +426,6 @@ void rPorygon(f32 x, f32 y, f32 r)
     mIdent(&model);
     mTranslate(&model, x, y, 0.f);
     mRotZ(&model, r);
-
-    if(za != 0.0)
-        mScale(&model, 1.f, 1.f, 0.1f);
-
-    mMul(&modelview, &model, &view);
 
     // returns direction
     mGetDirY(&zd, model);
