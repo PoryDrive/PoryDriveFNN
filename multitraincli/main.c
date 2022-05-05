@@ -920,7 +920,8 @@ int main(int argc, char** argv)
     // cause any impact on the CPS.
 
     // screen refresh rate
-    const useconds_t wait = 1000000/144;
+    const useconds_t wait_interval = 1000000/144;
+    useconds_t wait = wait_interval;
 
     // init
     configScarletFast();
@@ -972,6 +973,10 @@ int main(int argc, char** argv)
 
         if(timeout != 0 && t-st >= timeout)
             return 0;
+        
+        wait = wait_interval - (useconds_t)((glfwGetTime() - t) * 1000000.0);
+        if(wait > wait_interval)
+            wait = wait_interval;
     }
 
     // done

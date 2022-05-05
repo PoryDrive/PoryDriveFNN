@@ -105,6 +105,8 @@ double t = 0;   // time
 double dt = 0;  // delta time
 double fc = 0;  // frame count
 double lfct = 0;// last frame count time
+double lc = 0;  // logic count
+double llct = 0;// last logic count time
 f32 aspect;
 double x,y,lx,ly;
 double rww, ww, rwh, wh, ww2, wh2;
@@ -1048,7 +1050,7 @@ void main_loop()
     if(t > ltut)
     {
         timeTaken(1);
-        char title[256];
+        char title[512];
         const f32 dsp = fabsf(sp*(1.f/maxspeed)*130.f);
         sprintf(title, "| %s | Speed %.f MPH | Porygon %u | %s", tts, dsp, cp, cname);
         glfwSetWindowTitle(window, title);
@@ -1477,8 +1479,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 char strts[16];
                 timestamp(&strts[0]);
                 printf("[%s] FPS: %g\n", strts, fc/(t-lfct));
+                printf("[%s] LPS: %g\n", strts, lc/(t-llct));
                 lfct = t;
                 fc = 0;
+                llct = t;
+                lc = 0;
             }
         }
 
@@ -1784,31 +1789,81 @@ int main(int argc, char** argv)
     lfct = t;
     dt = 1.0 / 144.0; // fixed timestep delta-time
     
-    // efficient event loop
+    // lps accurate event loop
     const double fps_limit = 1.0 / maxfps;
-    double rlim = 0.f;
-    const useconds_t wait = 1000000 / 144;
+    double rlim = 0.0;
+    const useconds_t wait_interval = 1000000 / 144;
+    useconds_t wait = wait_interval;
     while(!glfwWindowShouldClose(window))
     {
         usleep(wait);
         t = glfwGetTime();
         glfwPollEvents();
 
-        if(maxfps <= 144.0)
+        //printf("%f %f %f\n", maxfps, t, rlim);
+        if(maxfps < 144.0)
         {
+            //printf("%f %f\n", t, rlim);
             if(t > rlim)
             {
                 RENDER_PASS = 1;
                 rlim = t + fps_limit;
                 fc++;
             }
-            else{RENDER_PASS = 0;}
+            else
+                RENDER_PASS = 0;
+        }
+        else
+        {
+            RENDER_PASS = 1;
+            fc++;
         }
 
-        main_loop();   
+        main_loop();
+
+        // accurate lps
+        wait = wait_interval - (useconds_t)((glfwGetTime() - t) * 1000000.0);
+        if(wait > wait_interval)
+            wait = wait_interval;
+        lc++;
     }
 
-    // accurate event loop
+    // fps accurate event loop (not quite)
+    // const double fps_limit = 1.0 / maxfps;
+    // double rlim = 0.0;
+    // const useconds_t wait_interval = 1000000 / 144;
+    // useconds_t wait = wait_interval;
+    // while(!glfwWindowShouldClose(window))
+    // {
+    //     usleep(wait);
+    //     t = glfwGetTime();
+    //     glfwPollEvents();
+
+    //     //printf("%f %f %f\n", maxfps, t, rlim);
+    //     if(maxfps < 144.0)
+    //     {
+    //         //printf("%f %f\n", t, rlim);
+    //         if(t > rlim)
+    //             RENDER_PASS = 1;
+    //         else
+    //             RENDER_PASS = 0;
+    //     }
+    //     else
+    //         RENDER_PASS = 1;
+
+    //     main_loop();
+
+    //     //accurate fps or lps, not both
+    //     if(RENDER_PASS == 1)
+    //     {
+    //         rlim = t + fps_limit - (glfwGetTime() - t);
+    //         fc++;
+    //     }
+
+    //     lc++;
+    // }
+
+    // max fps accurate event loop
     // const double fps_limit = 1.0 / 144.0;
     // double fpsllt = 0.f;
     // while(!glfwWindowShouldClose(window))

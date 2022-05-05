@@ -1,2 +1,2 @@
-clang main.c -I ../inc -Ofast -lm -o porydrivecli
+gcc main.c -I ../inc -Ofast -lm -o porydrivecli
 ./porydrivecli
