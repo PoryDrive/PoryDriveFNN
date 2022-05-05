@@ -988,13 +988,6 @@ static inline uint isnorm(const f32 f)
 void main_loop()
 {
 //*************************************
-// time delta for interpolation
-//*************************************
-    // static double lt = 0;
-    // dt = t-lt;
-    // lt = t;
-
-//*************************************
 // keystates
 //*************************************
     f32 tr = maxsteer * ((maxspeed-sp) * steerinertia);

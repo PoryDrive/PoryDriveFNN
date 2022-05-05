@@ -531,13 +531,6 @@ static inline uint isnorm(const f32 f)
 void main_loop()
 {
 //*************************************
-// time delta for interpolation
-//*************************************
-    // static double lt = 0;
-    // dt = t-lt;
-    // lt = t;
-
-//*************************************
 // update stats
 //*************************************
     // static double ltut = 3.0;
