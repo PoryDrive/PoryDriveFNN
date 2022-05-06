@@ -98,7 +98,7 @@ ad_maxspeed_reductor = 0.5
 ## game
 Drive around and "collect" Porygon, each time you collect a Porygon a new one will randomly spawn somewhere on the map. A Porygon colliding with a purple cube will cause it to light up blue, this can help you find them. Upon right clicking the mouse you will switch between Ariel and Close views, in the Ariel view it is easier to see which of the purple cubes that the Porygon is colliding with.
 
-## Keyboard
+#### keyboard
  - `ESCAPE` = Focus/Unfocus Mouse Look
  - `N` = New Game
  - `W` = Drive Forward
@@ -108,7 +108,7 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `Space` = Breaks
  - `1-5` = Car Physics config selection _(5 loads from file)_
 
-## Keyboard Dev
+#### keyboard dev
  - `F` = FPS to console
  - `P` = Player stats to console
  - `O` = Toggle auto drive
@@ -116,7 +116,7 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `L` = Toggle dataset logging
  - `R` = Increment porygon collected count
 
-## Mouse
+#### mouse
  - `Mouse Button4` = Zoom Snap Close/Ariel
  - `Mouse Click Right` = Zoom Snap Close/Ariel
  - `Middle Scroll` = Zoom in/out
