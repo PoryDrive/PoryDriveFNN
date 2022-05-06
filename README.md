@@ -44,6 +44,20 @@ Porydrive in datalogging mode: `./porydrive 0 0 1`
 
 There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh). This script is set to execute 128 processes each time because it is best to launch 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launch at the same time.
 
+## nan
+
+I've created gigabytes of different datasets at this point using both [/multitraingui](/multitraingui) (GUI) and [/multitraincli](/multitraincli) (CLI) and this is what you need to know..
+
+I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
+
+The main difference between CLI and GUI dataset aggregation:
+- **GUI:** ~1GB dataset takes 10 hours using 10 processes running simultaneously.
+- **CLI:** ~1GB dataset takes 10 minutes using 600 processes running simultaneously.
+
+It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
+
+It's just worth keeping this in mind if your dataset starts producing a NaN loss when training with it. I am not completely sure why this is yet, I am checking that the CLI processes do not write NaN floats to the dataset _(before they are written)_, I check for any write corruption to the extent that I can in real-time which is just that the number of bytes written is correct. It is possible that the high frequency and resource demanding nature of the CLI processes all running at once could be causing bytes to be miss-written to file creating NaN's in the dataset, checking the bytes after writing them could detect this and is an option that comes at a cost to performance but one I will probably be adding.
+
 ## config.txt
 It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car physics variables.
 ```
@@ -68,17 +82,3 @@ steeringtransferinertia 280
 - `maxsteer` - maximum steering angle as scalar _(1 = 180 degree)_ attainable at minimal speeds.
 - `steeringtransfer` - how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
 - `steeringtransferinertia` - how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
-
-## nan
-
-I've created gigabytes of different datasets at this point using both [/multitraingui](/multitraingui) (GUI) and [/multitraincli](/multitraincli) (CLI) and this is what you need to know..
-
-I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
-
-The main difference between CLI and GUI dataset aggregation:
-- **GUI:** ~1GB dataset takes 10 hours using 10 processes running simultaneously.
-- **CLI:** ~1GB dataset takes 10 minutes using 600 processes running simultaneously.
-
-It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
-
-It's just worth keeping this in mind if your dataset starts producing a NaN loss when training with it. I am not completely sure why this is yet, I am checking that the CLI processes do not write NaN floats to the dataset _(before they are written)_, I check for any write corruption to the extent that I can in real-time which is just that the number of bytes written is correct. It is possible that the high frequency and resource demanding nature of the CLI processes all running at once could be causing bytes to be miss-written to file creating NaN's in the dataset, checking the bytes after writing them could detect this and is an option that comes at a cost to performance but one I will probably be adding.
