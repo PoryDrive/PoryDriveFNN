@@ -2,6 +2,7 @@
 #       C to Keras Bridge for Predictor
 #               APRIL 2022
 import sys
+import os
 import numpy as np
 from tensorflow import keras
 from os.path import isfile
@@ -9,6 +10,8 @@ from os.path import getsize
 from os import remove
 from struct import pack
 from time import sleep
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 input_size = 6
 model_name = sys.argv[1]
