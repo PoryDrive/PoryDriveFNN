@@ -5,7 +5,7 @@ A Feed-Forward Neural Network trained by a classical autonomous AI.
 
 This is forked from [mrbid/porydrive](https://github.com/mrbid/porydrive).
 
-Focused on using Tensorflow Keras on Linux. Training and gameplay has been set to ~144 FPS.
+Focused on using Tensorflow Keras on Linux. Training and gameplay has been set to ~144 updates per second, frame rate can be limited independently.
 
 ## info
 
