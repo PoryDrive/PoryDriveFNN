@@ -152,6 +152,7 @@ elif optimiser == 'adamax':
     optim = keras.optimizers.Adamax(learning_rate=0.001)
 elif optimiser == 'ftrl':
     optim = keras.optimizers.Ftrl(learning_rate=0.001)
+
 model.compile(optimizer=optim, loss='mean_squared_error')
 
 # train network
