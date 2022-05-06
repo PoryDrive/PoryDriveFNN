@@ -32,6 +32,7 @@ np.set_printoptions(threshold=sys.maxsize)
 # hyperparameters
 seed(74035)
 model_name = 'keras_model'
+shuffled = ''
 optimiser = 'adam'
 inputsize = 6
 outputsize = 2
@@ -62,9 +63,8 @@ if argc >= 6 and sys.argv[5] == '1':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     print("CPU_ONLY: 1")
 
+# make sure save dir exists
 if not isdir('models'): mkdir('models')
-model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3]
-print("model_name:", model_name)
 
 # training set size
 tss = int(os.stat("dataset_y.dat").st_size / 8)
@@ -100,6 +100,8 @@ if isfile("numpy_x.npy"):
     train_x = np.load("numpy_x.npy")
     train_y = np.load("numpy_y.npy")
     print("Loaded shuffled numpy arrays")
+    model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
+    print("model_name:", model_name)
 else:
     with open("dataset_x.dat", 'rb') as f:
         data = np.fromfile(f, dtype=np.float32)
@@ -110,6 +112,8 @@ else:
         train_y = np.reshape(data, [tss, outputsize])
 
     print("Loaded regular arrays; no shuffle")
+    model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
+    print("model_name:", model_name)
 
     # shuffle_in_unison(train_x, train_y)
     
@@ -121,6 +125,8 @@ else:
 # print(train_y.shape)
 # print(train_y)
 # exit()
+
+
 
 timetaken = (time_ns()-st)/1e+9
 print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
