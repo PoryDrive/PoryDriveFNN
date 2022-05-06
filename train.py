@@ -12,6 +12,8 @@ from random import seed
 from time import time_ns
 from sys import exit
 from os.path import isfile
+from os import mkdir
+from os.path import isdir
 
 # import tensorflow as tf
 # from tensorflow.python.client import device_lib
@@ -35,6 +37,7 @@ inputsize = 6
 outputsize = 2
 training_iterations = 1
 activator = 'tanh'
+layers = 4
 layer_units = 384
 batches = 32
 # layer_units = 1024
@@ -44,19 +47,23 @@ batches = 32
 argc = len(sys.argv)
 print(argc)
 if argc >= 2:
-    layer_units = int(sys.argv[1])
-    print("layer_units:", layer_units)
+    layers = int(sys.argv[1])
+    print("layers:", layers)
 if argc >= 3:
-    batches = int(sys.argv[2])
-    print("batches:", batches)
+    layer_units = int(sys.argv[2])
+    print("layer_units:", layer_units)
 if argc >= 4:
-    optimiser = sys.argv[3]
+    batches = int(sys.argv[3])
+    print("batches:", batches)
+if argc >= 5:
+    optimiser = sys.argv[4]
     print("optimiser:", optimiser)
-if argc >= 5 and sys.argv[4] == '1':
+if argc >= 6 and sys.argv[5] == '1':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     print("CPU_ONLY: 1")
 
-model_name = 'models/' + optimiser + '_' + sys.argv[1]
+if not isdir('models'): mkdir('models')
+model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3]
 print("model_name:", model_name)
 
 # training set size
@@ -121,15 +128,11 @@ print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
 model = Sequential()
 
 model.add(Dense(layer_units, activation=activator, input_dim=inputsize))
-
-model.add(Dense(layer_units/2, activation=activator))
-model.add(Dense(layer_units/4, activation=activator))
-
-model.add(Dense(layer_units/8, activation=activator))
-model.add(Dense(layer_units/16, activation=activator))
-
+if layers > 0: model.add(Dense(layer_units/2, activation=activator))
+if layers > 1: model.add(Dense(layer_units/4, activation=activator))
+if layers > 2: model.add(Dense(layer_units/8, activation=activator))
+if layers > 3: model.add(Dense(layer_units/16, activation=activator))
 # model.add(Dropout(.2))
-
 model.add(Dense(outputsize, activation='tanh'))
 
 # output summary
