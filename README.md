@@ -71,6 +71,7 @@ steeringspeed 1.2
 steerinertia 233
 minsteer 0.32
 maxsteer 0.55
+steering_deadzone = 0.013
 steeringtransfer 0.023
 steeringtransferinertia 280
 suspension_pitch = 3

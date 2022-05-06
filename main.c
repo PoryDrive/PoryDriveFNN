@@ -324,8 +324,14 @@ void configOriginal()
     steerinertia = 233.f;
     minsteer = 0.1f;
     maxsteer = 0.7f;
+    steering_deadzone = 0.013f;
     steeringtransfer = 0.023f;
     steeringtransferinertia = 280.f;
+
+    suspension_pitch = 3.f;
+    suspension_pitch_limit = 0.03f;
+    suspension_roll = 30.f;
+    suspension_roll_limit = 0.03f;
 
     char strts[16];
     timestamp(&strts[0]);
@@ -343,8 +349,14 @@ void configScarlet()
     steerinertia = 233.f;
     minsteer = 0.32f;
     maxsteer = 0.55f;
+    steering_deadzone = 0.013f;
     steeringtransfer = 0.023f;
     steeringtransferinertia = 280.f;
+
+    suspension_pitch = 3.f;
+    suspension_pitch_limit = 0.03f;
+    suspension_roll = 30.f;
+    suspension_roll_limit = 0.03f;
     
     char strts[16];
     timestamp(&strts[0]);
@@ -362,8 +374,14 @@ void configScarletFast()
     steerinertia = 180.f;
     minsteer = 0.16f;
     maxsteer = 0.3f;
+    steering_deadzone = 0.013f;
     steeringtransfer = 0.023f;
     steeringtransferinertia = 280.f;
+
+    suspension_pitch = 3.f;
+    suspension_pitch_limit = 0.03f;
+    suspension_roll = 30.f;
+    suspension_roll_limit = 0.03f;
     
     char strts[16];
     timestamp(&strts[0]);
@@ -381,8 +399,14 @@ void configHybrid()
     steerinertia = 233.f;
     minsteer = 0.1f;
     maxsteer = 0.2f;
+    steering_deadzone = 0.013f;
     steeringtransfer = 0.023f;
     steeringtransferinertia = 280.f;
+
+    suspension_pitch = 3.f;
+    suspension_pitch_limit = 0.03f;
+    suspension_roll = 30.f;
+    suspension_roll_limit = 0.03f;
     
     char strts[16];
     timestamp(&strts[0]);
