@@ -45,8 +45,8 @@ print("Shuffling...")
 shuffle_in_unison(train_x, train_y)
 
 print("Saving...")
-np.save("numpy_x", train_x)
-np.save("numpy_y", train_y)
+np.save("numpy_x.npy", train_x)
+np.save("numpy_y.npy", train_y)
 
 timetaken = (time_ns()-st)/1e+9
 print("Time Taken:", "{:.2f}".format(timetaken), "seconds")

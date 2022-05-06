@@ -96,9 +96,9 @@ train_y = []
 
 # shuffle_in_unison(train_x, train_y)
 
-if isfile("numpy_x"):
-    train_x = np.load("numpy_x")
-    train_y = np.load("numpy_y")
+if isfile("numpy_x.npy"):
+    train_x = np.load("numpy_x.npy")
+    train_y = np.load("numpy_y.npy")
     print("Loaded shuffled numpy arrays")
 else:
     with open("dataset_x.dat", 'rb') as f:
@@ -113,8 +113,8 @@ else:
 
     # shuffle_in_unison(train_x, train_y)
     
-    # np.save("numpy_x", train_x)
-    # np.save("numpy_y", train_y)
+    # np.save("numpy_x.npy", train_x)
+    # np.save("numpy_y.npy", train_y)
 
 # print(train_x.shape)
 # print(train_x)
