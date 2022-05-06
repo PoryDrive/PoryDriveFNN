@@ -73,6 +73,10 @@ minsteer 0.32
 maxsteer 0.55
 steeringtransfer 0.023
 steeringtransferinertia 280
+suspension_pitch = 3
+suspension_pitch_limit = 0.03
+suspension_roll = 30
+suspension_roll_limit = 0.03
 
 ad_min_dstep = 0.01
 ad_max_dstep = 0.06
@@ -88,8 +92,13 @@ ad_maxspeed_reductor = 0.5
 - `steerinertia` - how much of the max steering angle is lost as the car increases in speed _(crude steering loss)_.
 - `minsteer` - minimum steering angle as scalar _(1 = 180 degree)_ attainable after steering loss caused by `steeringintertia`.
 - `maxsteer` - maximum steering angle as scalar _(1 = 180 degree)_ attainable at minimal speeds.
+- `steering_deadzone` - minimum angle of steering considered the deadzone or cutoff, within this angle the steering angle will always be forced to zero.
 - `steeringtransfer` - how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
 - `steeringtransferinertia` - how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
+- `suspension_pitch` - suspension pitch increment scalar
+- `suspension_pitch_limit` - max & min pitch limit
+- `suspension_roll` - suspension roll increment scalar
+- `suspension_roll_limit` - max & min roll limit
 
 #### auto drive variables
 - `ad_min_dstep` - minimum delta-distance from the porygon that can trigger a change in steering direction. The delta-distance is the amount of change in the distance since the last update.

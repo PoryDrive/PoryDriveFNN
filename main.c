@@ -197,8 +197,13 @@ f32 steeringspeed = 1.4f;
 f32 steerinertia = 180.f;
 f32 minsteer = 0.16f;
 f32 maxsteer = 0.45f;
+f32 steering_deadzone = 0.013f;
 f32 steeringtransfer = 0.019f;
 f32 steeringtransferinertia = 280.f;
+f32 suspension_pitch = 3.f;
+f32 suspension_pitch_limit = 0.03f;
+f32 suspension_roll = 30.f;
+f32 suspension_roll_limit = 0.03f;
 
 char cname[256] = {0};
 
@@ -248,8 +253,13 @@ void loadConfig(uint type)
                 if(strcmp(set, "steerinertia") == 0){steerinertia = val;}
                 if(strcmp(set, "minsteer") == 0){minsteer = val;}
                 if(strcmp(set, "maxsteer") == 0){maxsteer = val;}
+                if(strcmp(set, "steering_deadzone") == 0){steering_deadzone = val;}
                 if(strcmp(set, "steeringtransfer") == 0){steeringtransfer = val;}
                 if(strcmp(set, "steeringtransferinertia") == 0){steeringtransferinertia = val;}
+                if(strcmp(set, "suspension_pitch") == 0){suspension_pitch = val;}
+                if(strcmp(set, "suspension_pitch_limit") == 0){suspension_pitch_limit = val;}
+                if(strcmp(set, "suspension_roll") == 0){suspension_roll = val;}
+                if(strcmp(set, "suspension_roll_limit") == 0){suspension_roll_limit = val;}
 
                 // auto drive
                 if(strcmp(set, "ad_min_dstep") == 0){ad_min_dstep = val;}
@@ -824,14 +834,13 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mGetDirY(&pbd, model);
         vInv(&pbd);
 
-        // maybe allow the suspension to be configured in the config.txt
-        f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
-        if(sy > 0.03f){sy = 0.03f;}
-        if(sy < -0.03f){sy = -0.03f;}
+        f32 sy = sp*suspension_pitch; // lol speed based and not torque (it will do for now)
+        if(sy > suspension_pitch_limit){sy = suspension_pitch_limit;}
+        if(sy < -suspension_pitch_limit){sy = -suspension_pitch_limit;}
         mRotY(&model, sy);
-        f32 sx = sr*30.f*sp; // turning suspension
-        // if(sx > 0.03f){sx = 0.03f;}
-        // if(sx < -0.03f){sx = -0.03f;}
+        f32 sx = sr*suspension_roll*sp; // turning suspension
+        if(sx > suspension_roll_limit){sx = suspension_roll_limit;}
+        if(sx < -suspension_roll_limit){sx = -suspension_roll_limit;}
         mRotX(&model, sx);
         mMul(&modelview, &model, &view);
 
@@ -1015,10 +1024,9 @@ void main_loop()
 
     if(keystate[0] == 0 && keystate[1] == 0)
     {
-        // maybe allow the min_steering_cutoff to be configured in the config.txt
-        if(sr > 0.013f)
+        if(sr > steering_deadzone)
             sr -= steeringspeed * dt;
-        else if(sr < -0.013f)
+        else if(sr < -steering_deadzone)
             sr += steeringspeed * dt;
         else
             sr = 0.f;
