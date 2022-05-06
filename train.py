@@ -147,6 +147,14 @@ elif optimiser == 'nadam':
     optim = keras.optimizers.Nadam(learning_rate=0.001)
 elif optimiser == 'adagrad':
     optim = keras.optimizers.Adagrad(learning_rate=0.001)
+elif optimiser == 'rmsprop':
+    optim = keras.optimizers.RMSprop(learning_rate=0.001)
+elif optimiser == 'adadelta':
+    optim = keras.optimizers.Adadelta(learning_rate=0.001)
+elif optimiser == 'adamax':
+    optim = keras.optimizers.Adamax(learning_rate=0.001)
+elif optimiser == 'ftrl':
+    optim = keras.optimizers.Ftrl(learning_rate=0.001)
 model.compile(optimizer=optim, loss='mean_squared_error')
 
 # train network
