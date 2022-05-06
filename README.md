@@ -11,9 +11,9 @@ Focused on using Tensorflow Keras on Linux. Training and gameplay has been set t
 
 I store all the trained models I liked in [/models](/models) numbered in order of when I trained them, generally higher numbers will be better models than the lower numbers - or at least that is what I think.
 
-I have excluded the dataset files because they are huge, at the time of writing this I use a 1GB `dataset_x.dat`. The best way to produce your own is to use [/multitraingui](/multitraingui) and then execute [/multitrain/cat.sh](/multitrain/cat.sh) to concatenate them all into one file. Run each `go.sh` file in each respective folder in [/multitrain](/multitrain) for a few hours, then close them all, once the datasets are not being written to anymore run `cat.sh` to do the concatenation. `combmain.sh` will concatenate any datasets in the root folder, and then overwrite the dataset in the root folder with the new dataset.
+I have excluded the dataset files because they are huge, at the time of writing this I use a 1GB `dataset_x.dat`. The best way to produce your own is to use [/multicapturegui](/multicapturegui) and then execute [/multicapture/cat.sh](/multicapture/cat.sh) to concatenate them all into one file. Run each `go.sh` file in each respective folder in [/multicapture](/multicapture) for a few hours, then close them all, once the datasets are not being written to anymore run `cat.sh` to do the concatenation. `combmain.sh` will concatenate any datasets in the root folder, and then overwrite the dataset in the root folder with the new dataset.
 
-It is much more efficient to make a dataset using [/multitraincli](/multitraincli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
+It is much more efficient to make a dataset using [/multicapturecli](/multicapturecli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
 ## input
 
@@ -41,14 +41,14 @@ Porydrive at 0 MSAA and 60 FPS: `./porydrive 0 60`<br>
 Porydrive in datalogging mode: `./porydrive 0 0 1`
 
 #### porydrivecli
-- The first command line parameter is the amount of rounds to execute, `cd multitraincli;./porydrive 8;`, for example, would execute one process for 8 rounds.
-- The second command line parameter is the amount of seconds before the process times out, e.g 8 rounds and timeout after 33 seconds, `cd multitraincli;./porydrive 8 33;`.
+- The first command line parameter is the amount of rounds to execute, `cd multicapturecli;./porydrive 8;`, for example, would execute one process for 8 rounds.
+- The second command line parameter is the amount of seconds before the process times out, e.g 8 rounds and timeout after 33 seconds, `cd multicapturecli;./porydrive 8 33;`.
 
-There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh). This script is set to execute 128 processes each time because it is best to launch 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launched at the same time.
+There is also an example script supplied [multicapturecli/go.sh](multicapturecli/go.sh). This script is set to execute 128 processes each time because it is best to launch 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launched at the same time.
 
 ## nan
 
-I've created gigabytes of different datasets at this point using both [/multitraingui](/multitraingui) (GUI) and [/multitraincli](/multitraincli) (CLI) and this is what you need to know..
+I've created gigabytes of different datasets at this point using both [/multicapturegui](/multicapturegui) (GUI) and [/multicapturecli](/multicapturecli) (CLI) and this is what you need to know..
 
 I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
 

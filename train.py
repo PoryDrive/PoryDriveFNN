@@ -28,14 +28,25 @@ np.set_printoptions(threshold=sys.maxsize)
 
 # hyperparameters
 seed(74035)
+model_name = 'keras_model'
 inputsize = 6
 outputsize = 2
 training_iterations = 1
 activator = 'tanh'
-# layer_units = 384
-# batches = 32
-layer_units = 1024
-batches = 64
+layer_units = 384
+batches = 32
+# layer_units = 1024
+# batches = 64
+
+# load options
+layer_units = sys.argv[1]
+batches = sys.argv[2]
+optimiser = sys.argv[3]
+model_name = sys.argv[4] + '_' + optimiser
+print("layer_units:", layer_units)
+print("batches:", batches)
+print("optimiser:", optimiser)
+print("model_name:", model_name)
 
 # training set size
 tss = int(os.stat("dataset_y.dat").st_size / 8)
@@ -97,8 +108,19 @@ model.add(Dense(outputsize, activation='tanh'))
 # output summary
 model.summary()
 
-# optim = keras.optimizers.Adam(lr=0.0001)
-model.compile(optimizer='adam', loss='mean_squared_error')
+if optimiser == 'adam':
+    optim = keras.optimizers.Adam(lr=0.001)
+elif optimiser == 'sgd':
+    optim = keras.optimizers.SGD(lr=0.01, momentum=0., decay=0., nesterov=False)
+elif optimiser == 'momentum':
+    optim = keras.optimizers.SGD(lr=0.01, momentum=0.9, decay=0., nesterov=False)
+elif optimiser == 'nesterov':
+    optim = keras.optimizers.SGD(lr=0.01, momentum=0.9, decay=0., nesterov=True)
+elif optimiser == 'nadam':
+    optim = keras.optimizers.Nadam(learning_rate=0.001)
+elif optimiser == 'adagrad':
+    optim = keras.optimizers.Adagrad(learning_rate=0.001)
+model.compile(optimizer=optim, loss='mean_squared_error')
 
 # train network
 model.fit(train_x, train_y, epochs=training_iterations, batch_size=batches)
@@ -111,4 +133,4 @@ print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
 ##########################################
 
 # save keras model
-model.save("keras_model")
+model.save(model_name)

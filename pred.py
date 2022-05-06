@@ -10,8 +10,9 @@ from struct import pack
 from time import sleep
 
 input_size = 6
+model_name = sys.argv[3]
 
-model = keras.models.load_model("keras_model")
+model = keras.models.load_model(model_name)
 input_size_floats = input_size*4
 while True:
         try:
