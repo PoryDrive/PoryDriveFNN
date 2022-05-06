@@ -1,6 +1,8 @@
 # PoryDriveFNN
 A Feed-Forward Neural Network trained by a classical autonomous AI.
 
+[![Screenshot of the PoryDrive game](https://raw.githubusercontent.com/mrbid/porydrive/main/screenshot.png)](https://www.youtube.com/watch?v=EoPIzxVX-9E "PoryDrive Game Video")
+
 This is forked from [mrbid/porydrive](https://github.com/mrbid/porydrive).
 
 Focused on using Tensorflow Keras on Linux. Training and gameplay has been set to ~144 FPS.
