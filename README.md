@@ -98,7 +98,7 @@ ad_maxspeed_reductor = 0.5
 - `ad_maxspeed_reductor` - the rate at which the speed reduces as the car approaches the porygon with respect to `ad_min_speedswitch`.
 
 ## game
-Drive around and "collect" Porygon, each time you collect a Porygon a new one will randomly spawn somewhere on the map. A Porygon colliding with a purple cube will cause it to light up blue, this can help you find them. Upon right clicking the mouse you will switch between Ariel and Close views, in the Ariel view it is easier to see which of the purple cubes that the Porygon is colliding with.
+Drive around and "collect" Porygon, each time a Porygon is collected a new one will randomly spawn somewhere on the map. A Porygon colliding with a purple cube will cause it to light up blue, this can help find them. Upon right clicking the mouse the view will switch between Ariel and Close views, in the Ariel view it is easier to see which of the purple cubes that the Porygon is colliding with.
 
 #### keyboard
  - `ESCAPE` = Focus/Unfocus Mouse Look
