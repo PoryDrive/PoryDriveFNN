@@ -1,6 +1,7 @@
 # James William Fletcher (james@voxdsp.com)
 #       C to Keras Bridge for Predictor
 #               APRIL 2022
+import sys
 import numpy as np
 from tensorflow import keras
 from os.path import isfile
@@ -10,7 +11,7 @@ from struct import pack
 from time import sleep
 
 input_size = 6
-model_name = sys.argv[3]
+model_name = sys.argv[1]
 
 model = keras.models.load_model(model_name)
 input_size_floats = input_size*4
