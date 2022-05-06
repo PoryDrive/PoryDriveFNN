@@ -239,6 +239,7 @@ void loadConfig(uint type)
                 if(type == 0)
                     printf("Setting Loaded: %s %g\n", set, val);
 
+                // car physics
                 if(strcmp(set, "maxspeed") == 0){maxspeed = val;}
                 if(strcmp(set, "acceleration") == 0){acceleration = val;}
                 if(strcmp(set, "inertia") == 0){inertia = val;}
@@ -249,6 +250,12 @@ void loadConfig(uint type)
                 if(strcmp(set, "maxsteer") == 0){maxsteer = val;}
                 if(strcmp(set, "steeringtransfer") == 0){steeringtransfer = val;}
                 if(strcmp(set, "steeringtransferinertia") == 0){steeringtransferinertia = val;}
+
+                // auto drive
+                if(strcmp(set, "ad_min_dstep") == 0){ad_min_dstep = val;}
+                if(strcmp(set, "ad_max_dstep") == 0){ad_max_dstep = val;}
+                if(strcmp(set, "ad_min_speedswitch") == 0){ad_min_speedswitch = val;}
+                if(strcmp(set, "ad_maxspeed_reductor") == 0){ad_maxspeed_reductor = val;}
             }
         }
         fclose(f);
@@ -817,6 +824,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mGetDirY(&pbd, model);
         vInv(&pbd);
 
+        // maybe allow the suspension to be configured in the config.txt
         f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
         if(sy > 0.03f){sy = 0.03f;}
         if(sy < -0.03f){sy = -0.03f;}
@@ -1007,6 +1015,7 @@ void main_loop()
 
     if(keystate[0] == 0 && keystate[1] == 0)
     {
+        // maybe allow the min_steering_cutoff to be configured in the config.txt
         if(sr > 0.013f)
             sr -= steeringspeed * dt;
         else if(sr < -0.013f)
