@@ -86,36 +86,41 @@ st = time_ns()
 train_x = []
 train_y = []
 
-with open("dataset_x.dat", 'rb') as f:
-    data = np.fromfile(f, dtype=np.float32)
-    train_x = np.reshape(data, [tss, inputsize])
+# with open("dataset_x.dat", 'rb') as f:
+#     data = np.fromfile(f, dtype=np.float32)
+#     train_x = np.reshape(data, [tss, inputsize])
 
-with open("dataset_y.dat", 'rb') as f:
-    data = np.fromfile(f, dtype=np.float32)
-    train_y = np.reshape(data, [tss, outputsize])
+# with open("dataset_y.dat", 'rb') as f:
+#     data = np.fromfile(f, dtype=np.float32)
+#     train_y = np.reshape(data, [tss, outputsize])
 
-# if isfile("numpy_x"):
-#     train_x = np.load("numpy_x")
-#     train_y = np.load("numpy_y")
-# else:
-#     with open("dataset_x.dat", 'rb') as f:
-#         data = np.fromfile(f, dtype=np.float32)
-#         train_x = np.reshape(data, [tss, inputsize])
+# shuffle_in_unison(train_x, train_y)
 
-#     with open("dataset_y.dat", 'rb') as f:
-#         data = np.fromfile(f, dtype=np.float32)
-#         train_y = np.reshape(data, [tss, outputsize])
+if isfile("numpy_x"):
+    train_x = np.load("numpy_x")
+    train_y = np.load("numpy_y")
+    print("Loaded shuffled numpy arrays")
+else:
+    with open("dataset_x.dat", 'rb') as f:
+        data = np.fromfile(f, dtype=np.float32)
+        train_x = np.reshape(data, [tss, inputsize])
 
-#     np.save("numpy_x", train_x)
-#     np.save("numpy_y", train_y)
+    with open("dataset_y.dat", 'rb') as f:
+        data = np.fromfile(f, dtype=np.float32)
+        train_y = np.reshape(data, [tss, outputsize])
+
+    print("Loaded regular arrays; no shuffle")
+
+    # shuffle_in_unison(train_x, train_y)
+    
+    # np.save("numpy_x", train_x)
+    # np.save("numpy_y", train_y)
 
 # print(train_x.shape)
 # print(train_x)
 # print(train_y.shape)
 # print(train_y)
 # exit()
-
-# shuffle_in_unison(train_x, train_y)
 
 timetaken = (time_ns()-st)/1e+9
 print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
