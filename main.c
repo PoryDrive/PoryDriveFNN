@@ -203,7 +203,7 @@ f32 steeringtransferinertia = 280.f;
 f32 suspension_pitch = 3.f;
 f32 suspension_pitch_limit = 0.03f;
 f32 suspension_roll = 30.f;
-f32 suspension_roll_limit = 0.03f;
+f32 suspension_roll_limit = 9.f;
 
 char cname[256] = {0};
 
@@ -331,7 +331,7 @@ void configOriginal()
     suspension_pitch = 3.f;
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
-    suspension_roll_limit = 0.03f;
+    suspension_roll_limit = 9.f;
 
     char strts[16];
     timestamp(&strts[0]);
@@ -356,7 +356,7 @@ void configScarlet()
     suspension_pitch = 3.f;
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
-    suspension_roll_limit = 0.03f;
+    suspension_roll_limit = 9.f;
     
     char strts[16];
     timestamp(&strts[0]);
@@ -381,7 +381,7 @@ void configScarletFast()
     suspension_pitch = 3.f;
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
-    suspension_roll_limit = 0.03f;
+    suspension_roll_limit = 9.f;
     
     char strts[16];
     timestamp(&strts[0]);
@@ -406,7 +406,7 @@ void configHybrid()
     suspension_pitch = 3.f;
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
-    suspension_roll_limit = 0.03f;
+    suspension_roll_limit = 9.f;
     
     char strts[16];
     timestamp(&strts[0]);

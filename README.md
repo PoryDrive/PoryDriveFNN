@@ -77,7 +77,7 @@ steeringtransferinertia 280
 suspension_pitch = 3
 suspension_pitch_limit = 0.03
 suspension_roll = 30
-suspension_roll_limit = 0.03
+suspension_roll_limit = 9
 
 ad_min_dstep = 0.01
 ad_max_dstep = 0.06
