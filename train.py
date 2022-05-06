@@ -39,8 +39,8 @@ batches = 32
 # batches = 64
 
 # load options
-layer_units = sys.argv[1]
-batches = sys.argv[2]
+layer_units = int(sys.argv[1])
+batches = int(sys.argv[2])
 optimiser = sys.argv[3]
 model_name = sys.argv[4] + '_' + optimiser
 print("layer_units:", layer_units)
