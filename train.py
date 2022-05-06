@@ -42,22 +42,22 @@ batches = 32
 
 # load options
 argc = len(sys.argv)
-
-if argc == 2:
-	layer_units = int(sys.argv[1])
-if argc == 3:
+print(argc)
+if argc >= 2:
+    layer_units = int(sys.argv[1])
+    print("layer_units:", layer_units)
+if argc >= 3:
     batches = int(sys.argv[2])
-if argc == 4:
+    print("batches:", batches)
+if argc >= 4:
     optimiser = sys.argv[3]
-if argc == 5 and sys.argv[4] == 1:
+    print("optimiser:", optimiser)
+if argc >= 5 and sys.argv[4] == '1':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-if argc == 6:
+    print("CPU_ONLY: 1")
+if argc >= 6:
     model_name = sys.argv[5] + '_' + optimiser
-
-print("layer_units:", layer_units)
-print("batches:", batches)
-print("optimiser:", optimiser)
-print("model_name:", model_name)
+    print("model_name:", model_name)
 
 # training set size
 tss = int(os.stat("dataset_y.dat").st_size / 8)
