@@ -116,59 +116,6 @@ void timestamp(char* ts)
     strftime(ts, 16, "%H:%M:%S", localtime(&tt));
 }
 
-void loadConfig(uint type)
-{
-    FILE* f = fopen("config.txt", "r");
-    if(f)
-    {
-        sprintf(cname, "config.txt");
-        
-        if(type == 1)
-        {
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] CONFIG: config.txt loaded.\n", strts);
-        }
-        else
-            printf("\nDetected config.txt loading settings...\n");
-
-        char line[256];
-        while(fgets(line, 256, f) != NULL)
-        {
-            char set[64];
-            memset(set, 0, 64);
-            float val;
-            
-            if(sscanf(line, "%63s %f", set, &val) == 2)
-            {
-                if(type == 0)
-                    printf("Setting Loaded: %s %g\n", set, val);
-
-                if(strcmp(set, "maxspeed") == 0){maxspeed = val;}
-                if(strcmp(set, "acceleration") == 0){acceleration = val;}
-                if(strcmp(set, "inertia") == 0){inertia = val;}
-                if(strcmp(set, "drag") == 0){drag = val;}
-                if(strcmp(set, "steeringspeed") == 0){steeringspeed = val;}
-                if(strcmp(set, "steerinertia") == 0){steerinertia = val;}
-                if(strcmp(set, "minsteer") == 0){minsteer = val;}
-                if(strcmp(set, "maxsteer") == 0){maxsteer = val;}
-                if(strcmp(set, "steeringtransfer") == 0){steeringtransfer = val;}
-                if(strcmp(set, "steeringtransferinertia") == 0){steeringtransferinertia = val;}
-            }
-        }
-        fclose(f);
-    }
-    else
-    {
-        if(type == 1)
-        {
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] CONFIG: No config.txt file detected.\n", strts);
-        }
-    }
-}
-
 static inline f32 fRandFloat(const float min, const float max)
 {
     return min + randf() * (max-min); 
