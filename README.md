@@ -44,6 +44,31 @@ Porydrive in datalogging mode: `./porydrive 0 0 1`
 
 There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh). This script is set to execute 128 processes each time because it is best to launch 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launch at the same time.
 
+## config.txt
+It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car physics variables.
+```
+maxspeed 0.0095
+acceleration 0.0025
+inertia 0.00015
+drag 0.00038
+steeringspeed 1.2
+steerinertia 233
+minsteer 0.32
+maxsteer 0.55
+steeringtransfer 0.023
+steeringtransferinertia 280
+```
+- `maxspeed` - top travel speed of car.
+- `acceleration` - increase of speed with respect to time.
+- `inertia` - minimum speed before car will move from a stationary state.
+- `drag` - loss in speed with respect to time.
+- `steeringspeed` - how fast the wheels turn.
+- `steerinertia` - how much of the max steering angle is lost as the car increases in speed _(crude steering loss)_.
+- `minsteer` - minimum steering angle as scalar _(1 = 180 degree)_ attainable after steering loss caused by `steeringintertia`.
+- `maxsteer` - maximum steering angle as scalar _(1 = 180 degree)_ attainable at minimal speeds.
+- `steeringtransfer` - how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
+- `steeringtransferinertia` - how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
+
 ## nan
 
 I've created gigabytes of different datasets at this point using both [/multitraingui](/multitraingui) (GUI) and [/multitraincli](/multitraincli) (CLI) and this is what you need to know..
