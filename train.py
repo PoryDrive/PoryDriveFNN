@@ -56,7 +56,7 @@ if argc >= 5 and sys.argv[4] == '1':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     print("CPU_ONLY: 1")
 
-model_name = 'models/' + optimiser + '_' + layer_units
+model_name = 'models/' + optimiser + '_' + sys.argv[1]
 print("model_name:", model_name)
 
 # training set size
