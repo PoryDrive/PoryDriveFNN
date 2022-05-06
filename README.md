@@ -111,12 +111,12 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `1-5` = Car Physics config selection _(5 loads from file)_
 
 #### keyboard dev
+ - `R` = Increment porygon collected count
  - `F` = FPS to console
  - `P` = Player stats to console
  - `O` = Toggle auto drive
  - `I` = Toggle neural drive
  - `L` = Toggle dataset logging
- - `R` = Increment porygon collected count
 
 #### mouse
  - `Mouse Button4` = Zoom Snap Close/Ariel
