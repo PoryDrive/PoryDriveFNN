@@ -403,9 +403,9 @@ void configHybrid()
     steeringtransfer = 0.023f;
     steeringtransferinertia = 280.f;
 
-    suspension_pitch = 3.f;
+    suspension_pitch = 1.5f;
     suspension_pitch_limit = 0.03f;
-    suspension_roll = 30.f;
+    suspension_roll = 15.f;
     suspension_roll_limit = 9.f;
     
     char strts[16];
