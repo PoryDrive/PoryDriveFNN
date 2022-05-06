@@ -15,7 +15,7 @@ I have excluded the dataset files because they are huge, at the time of writing 
 
 It is much more efficient to make a dataset using [/multicapturecli](/multicapturecli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
-FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line from [pred.py](pred.py) if you intend to use larger networks.
+FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
 ## input
 
