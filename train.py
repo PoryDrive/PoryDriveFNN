@@ -11,6 +11,7 @@ from tensorflow.keras.layers import Dropout
 from random import seed
 from time import time_ns
 from sys import exit
+from os.path import isfile
 
 # import tensorflow as tf
 # from tensorflow.python.client import device_lib
@@ -29,6 +30,7 @@ np.set_printoptions(threshold=sys.maxsize)
 # hyperparameters
 seed(74035)
 model_name = 'keras_model'
+optimiser = 'adam'
 inputsize = 6
 outputsize = 2
 training_iterations = 1
@@ -39,10 +41,19 @@ batches = 32
 # batches = 64
 
 # load options
-layer_units = int(sys.argv[1])
-batches = int(sys.argv[2])
-optimiser = sys.argv[3]
-model_name = sys.argv[4] + '_' + optimiser
+argc = len(sys.argv)
+
+if argc == 2:
+	layer_units = int(sys.argv[1])
+if argc == 3:
+    batches = int(sys.argv[2])
+if argc == 4:
+    optimiser = sys.argv[3]
+if argc == 5 and sys.argv[4] == 1:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+if argc == 6:
+    model_name = sys.argv[5] + '_' + optimiser
+
 print("layer_units:", layer_units)
 print("batches:", batches)
 print("optimiser:", optimiser)
@@ -66,14 +77,30 @@ st = time_ns()
 
 # load training data
 train_x = []
+train_y = []
+
 with open("dataset_x.dat", 'rb') as f:
     data = np.fromfile(f, dtype=np.float32)
     train_x = np.reshape(data, [tss, inputsize])
 
-train_y = []
 with open("dataset_y.dat", 'rb') as f:
     data = np.fromfile(f, dtype=np.float32)
     train_y = np.reshape(data, [tss, outputsize])
+
+# if isfile("numpy_x"):
+#     train_x = np.load("numpy_x")
+#     train_y = np.load("numpy_y")
+# else:
+#     with open("dataset_x.dat", 'rb') as f:
+#         data = np.fromfile(f, dtype=np.float32)
+#         train_x = np.reshape(data, [tss, inputsize])
+
+#     with open("dataset_y.dat", 'rb') as f:
+#         data = np.fromfile(f, dtype=np.float32)
+#         train_y = np.reshape(data, [tss, outputsize])
+
+#     np.save("numpy_x", train_x)
+#     np.save("numpy_y", train_y)
 
 # print(train_x.shape)
 # print(train_x)
@@ -81,7 +108,7 @@ with open("dataset_y.dat", 'rb') as f:
 # print(train_y)
 # exit()
 
-shuffle_in_unison(train_x, train_y)
+# shuffle_in_unison(train_x, train_y)
 
 timetaken = (time_ns()-st)/1e+9
 print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
