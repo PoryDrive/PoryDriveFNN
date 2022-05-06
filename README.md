@@ -94,3 +94,29 @@ ad_maxspeed_reductor = 0.5
 - `ad_max_dstep` - maximum delta-distance from the porygon, once this is set any distance above this limit will trigger a change in steering direction.
 - `ad_min_speedswitch` - minimum distance from the porygon before the speed of the car begins to linearly reduce as it approaches the porygon.
 - `ad_maxspeed_reductor` - the rate at which the speed reduces as the car approaches the porygon with respect to `ad_min_speedswitch`.
+
+## How to play
+Drive around and "collect" Porygon, each time you collect a Porygon a new one will randomly spawn somewhere on the map. A Porygon colliding with a purple cube will cause it to light up blue, this can help you find them. Upon right clicking the mouse you will switch between Ariel and Close views, in the Ariel view it is easier to see which of the purple cubes that the Porygon is colliding with.
+
+## Keyboard
+ - `ESCAPE` = Focus/Unfocus Mouse Look
+ - `N` = New Game
+ - `W` = Drive Forward
+ - `A` = Turn Left
+ - `S` = Drive Backward
+ - `D` = Turn Right
+ - `Space` = Breaks
+ - `1-5` = Car Physics config selection _(5 loads from file)_
+
+## Keyboard Dev
+ - `F` = FPS to console
+ - `P` = Player stats to console
+ - `O` = Toggle auto drive
+ - `I` = Toggle neural drive
+ - `L` = Toggle dataset logging
+ - `R` = Increment porygon collected count
+
+## Mouse
+ - `Mouse Button4` = Zoom Snap Close/Ariel
+ - `Mouse Click Right` = Zoom Snap Close/Ariel
+ - `Middle Scroll` = Zoom in/out
