@@ -86,16 +86,6 @@ st = time_ns()
 train_x = []
 train_y = []
 
-# with open("dataset_x.dat", 'rb') as f:
-#     data = np.fromfile(f, dtype=np.float32)
-#     train_x = np.reshape(data, [tss, inputsize])
-
-# with open("dataset_y.dat", 'rb') as f:
-#     data = np.fromfile(f, dtype=np.float32)
-#     train_y = np.reshape(data, [tss, outputsize])
-
-# shuffle_in_unison(train_x, train_y)
-
 if isfile("numpy_x.npy"):
     train_x = np.load("numpy_x.npy")
     train_y = np.load("numpy_y.npy")
@@ -115,18 +105,11 @@ else:
     model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
     print("model_name:", model_name)
 
-    # shuffle_in_unison(train_x, train_y)
-    
-    # np.save("numpy_x.npy", train_x)
-    # np.save("numpy_y.npy", train_y)
-
 # print(train_x.shape)
 # print(train_x)
 # print(train_y.shape)
 # print(train_y)
 # exit()
-
-
 
 timetaken = (time_ns()-st)/1e+9
 print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
