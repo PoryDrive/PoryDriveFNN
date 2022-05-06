@@ -93,4 +93,4 @@ ad_maxspeed_reductor = 0.5
 - `ad_min_dstep` - minimum delta-distance from the porygon that can trigger a change in steering direction. The delta-distance is the amount of change in the distance since the last update.
 - `ad_max_dstep` - maximum delta-distance from the porygon, once this is set any distance above this limit will trigger a change in steering direction.
 - `ad_min_speedswitch` - minimum distance from the porygon before the speed of the car begins to linearly reduce as it approaches the porygon.
-- `ad_maxspeed_reductor` - the rate at which the speed reduces as the car approaches the porygon
+- `ad_maxspeed_reductor` - the rate at which the speed reduces as the car approaches the porygon with respect to `ad_min_speedswitch`.
