@@ -1493,6 +1493,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             }
             else
             {
+                configScarletFast();
                 char strts[16];
                 timestamp(&strts[0]);
                 printf("[%s] Auto Drive: ON\n", strts);
@@ -1512,6 +1513,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             }
             else
             {
+                configScarletFast();
                 char strts[16];
                 timestamp(&strts[0]);
                 printf("[%s] Neural Drive: ON\n", strts);
