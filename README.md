@@ -71,7 +71,13 @@ minsteer 0.32
 maxsteer 0.55
 steeringtransfer 0.023
 steeringtransferinertia 280
+
+ad_min_dstep = 0.01
+ad_max_dstep = 0.06
+ad_min_speedswitch = 2
+ad_maxspeed_reductor = 0.5
 ```
+#### car physics variables
 - `maxspeed` - top travel speed of car.
 - `acceleration` - increase of speed with respect to time.
 - `inertia` - minimum speed before car will move from a stationary state.
@@ -82,3 +88,9 @@ steeringtransferinertia 280
 - `maxsteer` - maximum steering angle as scalar _(1 = 180 degree)_ attainable at minimal speeds.
 - `steeringtransfer` - how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
 - `steeringtransferinertia` - how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
+
+#### auto drive variables
+- `ad_min_dstep` - minimum delta-distance from the porygon that can trigger a change in steering direction. The delta-distance is the amount of change in the distance since the last update.
+- `ad_max_dstep` - maximum delta-distance from the porygon, once this is set any distance above this limit will trigger a change in steering direction.
+- `ad_min_speedswitch` - minimum distance from the porygon before the speed of the car begins to linearly reduce as it approaches the porygon.
+- `ad_maxspeed_reductor` - the rate at which the speed reduces as the car approaches the porygon
