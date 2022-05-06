@@ -5,10 +5,10 @@ batches=32
 for i in {0..4}; do
 
     optim="adam"
-    xterm -e "python3 train.py $layers 128 $batches $optim 1" &
+    xterm -e "python3 train.py $layers $units $batches $optim 1" &
 
     optim="nesterov"
-    xterm -e "python3 train.py $layers 128 $batches $optim 1" &
+    xterm -e "python3 train.py $layers $units $batches $optim 1" &
 
     echo "$layers $units $batches"
     layers=$((layers+1))
