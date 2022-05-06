@@ -44,7 +44,7 @@ Porydrive in datalogging mode: `./porydrive 0 0 1`
 - The first command line parameter is the amount of rounds to execute, `cd multitraincli;./porydrive 8;`, for example, would execute one process for 8 rounds.
 - The second command line parameter is the amount of seconds before the process times out, e.g 8 rounds and timeout after 33 seconds, `cd multitraincli;./porydrive 8 33;`.
 
-There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh). This script is set to execute 128 processes each time because it is best to launch 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launch at the same time.
+There is also an example script supplied [multitraincli/go.sh](multitraincli/go.sh). This script is set to execute 128 processes each time because it is best to launch 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launched at the same time.
 
 ## nan
 
