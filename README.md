@@ -60,7 +60,7 @@ It is much easier to create more CLI processes on one machine than GUI processes
 
 It's just worth keeping this in mind if your dataset starts producing a NaN loss when training with it. I am not completely sure why this is yet, I am checking that the CLI processes do not write NaN floats to the dataset _(before they are written)_, I check for any write corruption to the extent that I can in real-time which is just that the number of bytes written is correct. It is possible that the high frequency and resource demanding nature of the CLI processes all running at once could be causing bytes to be miss-written to file creating NaN's in the dataset, checking the bytes after writing them could detect this and is an option that comes at a cost to performance but one I will probably be adding.
 
-## config.txt
+## config
 It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car physics variables.
 ```
 maxspeed 0.0095
