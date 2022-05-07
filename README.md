@@ -7,6 +7,16 @@ This is forked from [mrbid/porydrive](https://github.com/mrbid/porydrive).
 
 Focused on using Tensorflow Keras on Linux. Training and gameplay has been set to ~144 updates per second, frame rate can be limited independently.
 
+## how
+
+Create a dataset using [/multicapturecli](/multicapturecli) or [/multicapturegui](/multicapturegui) or `./porydrive` and press `O` to enable Auto Drive and then `L` to enable the datalogger.
+
+- [`shuff.py`](shuff.py) - _(optional)_ shuffle the dataset.
+- [`train.py`](train.py) - train a model from the dataset `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
+- [`pred.py`](pred.py) - run the predictor daemon so that the `./porydrive` program can communicate with the Tensorflow Keras backend `python3 pred.py <model_path>`.
+
+Then run `./porydrive` and press `I` to enter Neural Drive mode.
+
 ## info
 
 I store all the trained models I liked in [/models](/models) numbered in order of when I trained them, generally higher numbers will be better models than the lower numbers - or at least that is what I think.
