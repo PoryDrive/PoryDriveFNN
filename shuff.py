@@ -1,5 +1,5 @@
 # James William Fletcher - May 2022
-# https://github.com/mrbid/porydrivekeras
+# https://github.com/PoryDrive/PoryDriveFNN
 import sys
 import os
 import numpy as np
