@@ -9,7 +9,7 @@ Focused on using Tensorflow Keras on Linux. Training and gameplay has been set t
 
 ## how
 
-Create a dataset using [/multicapturecli](/multicapturecli) or [/multicapturegui](/multicapturegui) or `./porydrive` and press `O` to enable Auto Drive and then `L` to enable the datalogger.
+Create a dataset using [/multicapturecli](/multicapturecli) or [/multicapturegui](/multicapturegui) or `./porydrive` and press `O` to enable Auto Drive and then `L` to enable the datalogger. _(I've already trained so many datasets in [models_historical](models_historical) that you don't really need to train your own)_
 
 - [`shuff.py`](shuff.py) - _(optional)_ shuffle the dataset.
 - [`train.py`](train.py) - train a model from the dataset `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
