@@ -9,7 +9,7 @@ Focused on using Tensorflow Keras on Linux. Training and gameplay has been set t
 
 ## how
 
-Create a dataset using [/multicapturecli](/multicapturecli) or [/multicapturegui](/multicapturegui) or `./porydrive` and press `O` to enable Auto Drive and then `L` to enable the datalogger. _(I've already trained so many models in [models_historical](models_historical) that you don't really need to aggregate a dataset to train your own)_
+Create a dataset using [/multicapturecli](/multicapturecli) or [/multicapturegui](/multicapturegui) or `./porydrive` and press `O` to enable Auto Drive and then `L` to enable the datalogger. _(I've already trained so many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you don't really need to aggregate a dataset to train your own)_
 
 - [`shuff.py`](shuff.py) - _(optional)_ shuffle the dataset.
 - [`train.py`](train.py) - train a model from the dataset `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
@@ -25,7 +25,7 @@ It is much more efficient to make a dataset using [/multicapturecli](/multicaptu
 
 Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
-I've trained a lot of models at this point and most of the ones I liked are in [models_historical/original/ADAM](models_historical/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](models_historical/original/SGD) I liked. But after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
+I've trained a lot of models at this point and most of the ones I liked are in [https://github.com/PoryDrive/PoryDriveFNN_models/original/ADAM](https://github.com/PoryDrive/PoryDriveFNN_models/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](https://github.com/PoryDrive/PoryDriveFNN_models/original/SGD) I liked. But after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
 
 ## input
 
