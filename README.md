@@ -23,7 +23,7 @@ I have excluded the dataset files because they are huge, at the time of writing 
 
 It is much more efficient to make a dataset using [/multicapturecli](/multicapturecli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
-FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
+Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
 I've trained a lot of models at this point and most of the ones I liked are in [models_historical/original/ADAM](models_historical/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](models_historical/original/SGD) I liked. But after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
 
