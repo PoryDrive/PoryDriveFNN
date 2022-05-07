@@ -25,7 +25,7 @@ It is much more efficient to make a dataset using [/multicapturecli](/multicaptu
 
 Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
-I've trained a lot of models at this point and most of the ones I liked are in [https://github.com/PoryDrive/PoryDriveFNN_models/original/ADAM](https://github.com/PoryDrive/PoryDriveFNN_models/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](https://github.com/PoryDrive/PoryDriveFNN_models/original/SGD) I liked. But after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
+I've trained a lot of models at this point and most of the ones I liked are in [PoryDriveFNN_models/original/ADAM](https://github.com/PoryDrive/PoryDriveFNN_models/tree/main/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](https://github.com/PoryDrive/PoryDriveFNN_models/original/SGD) I liked. But after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
 
 ## input
 
