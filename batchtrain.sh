@@ -22,18 +22,10 @@
 # python3 train.py 4 768 64 adagrad 1
 # python3 train.py 4 2048 64 adagrad 0
 
-python3 train.py 4 2048 64 nesterov 0
-python3 train.py 4 2048 64 nadam 0
-python3 train.py 4 2048 64 adam 0
-
-python3 train.py 4 4096 64 nesterov 0
-python3 train.py 4 4096 64 nadam 0
-python3 train.py 4 4096 64 adam 0
-
 python3 train.py 4 4096 128 nesterov 0
-python3 train.py 4 4096 128 nadam 0
-python3 train.py 4 4096 128 adam 0
-
 python3 train.py 4 2048 32 nesterov 0
-python3 train.py 4 2048 32 nadam 0
-python3 train.py 4 2048 32 adam 0
+python3 train.py 4 4096 32 nesterov 0
+python3 train.py 4 8192 256 nesterov 0
+python3 train.py 4 8192 128 nesterov 0
+python3 train.py 4 8192 64 nesterov 0
+python3 train.py 4 8192 32 nesterov 0
