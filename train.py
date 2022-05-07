@@ -46,7 +46,6 @@ batches = 32
 
 # load options
 argc = len(sys.argv)
-print(argc)
 if argc >= 2:
     layers = int(sys.argv[1])
     print("layers:", layers)
