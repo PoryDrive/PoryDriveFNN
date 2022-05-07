@@ -19,15 +19,13 @@ Then run `./porydrive` and press `I` to enter Neural Drive mode.
 
 ## info
 
-I store all the trained models I liked in [/models](/models) numbered in order of when I trained them, generally higher numbers will be better models than the lower numbers - or at least that is what I think.
-
 I have excluded the dataset files because they are huge, at the time of writing this I use a 1GB `dataset_x.dat`. The best way to produce your own is to use [/multicapturegui](/multicapturegui) and then execute [/multicapture/cat.sh](/multicapture/cat.sh) to concatenate them all into one file. Run each `go.sh` file in each respective folder in [/multicapture](/multicapture) for a few hours, then close them all, once the datasets are not being written to anymore run `cat.sh` to do the concatenation. `combmain.sh` will concatenate any datasets in the root folder, and then overwrite the dataset in the root folder with the new dataset.
 
 It is much more efficient to make a dataset using [/multicapturecli](/multicapturecli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
 
 FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
-I've trained a lot of models at this point and a most of the ones I liked are in [models_historical/original/ADAM](models_historical/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](models_historical/original/SGD) I liked. but after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
+I've trained a lot of models at this point and most of the ones I liked are in [models_historical/original/ADAM](models_historical/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](models_historical/original/SGD) I liked. but after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
 
 ## input
 
