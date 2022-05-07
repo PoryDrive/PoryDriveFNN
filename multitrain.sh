@@ -1,6 +1,6 @@
 #!/bin/bash
 layers=0
-units=128
+units=384
 batches=32
 for i in {0..4}; do
 
