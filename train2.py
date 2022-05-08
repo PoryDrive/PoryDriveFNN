@@ -1,4 +1,4 @@
-# James William Fletcher - April 2022
+# James William Fletcher - May 2022
 # https://github.com/PoryDrive/PoryDriveFNN
 import sys
 import os
