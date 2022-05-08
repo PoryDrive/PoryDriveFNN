@@ -61,10 +61,10 @@ Porydrive in datalogging mode: `./porydrive 0 0 1`
 There is also an example script supplied [multicapturecli/go.sh](multicapturecli/go.sh). This script is set to execute 128 processes each time because it is best to stagger the launch of 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launched at the same time.
 
 #### train.py
-`python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
+`python3 train.py <layers 0-4> <layer units> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
 
 #### train2.py
-`python3 train.py <layers> <units per layer> <batches> <activator> <optimiser: adam,nesterov,etc> <cpu only 1/0>`<br>
+`python3 train.py <layers> <layer units> <batches> <activator> <optimiser> <cpu only 1/0>`<br>
 _This is targeted at SELU style networks using many layers with few units for example;_ `python3 train.py 16 32 32 selu nesterov 1`
 
 #### pred.py
