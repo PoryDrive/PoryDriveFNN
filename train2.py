@@ -90,7 +90,7 @@ if isfile("numpy_x.npy"):
     train_x = np.load("numpy_x.npy")
     train_y = np.load("numpy_y.npy")
     print("Loaded shuffled numpy arrays")
-    model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
+    model_name = 'models/' + activator + '_' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
     print("model_name:", model_name)
 else:
     with open("dataset_x.dat", 'rb') as f:
@@ -102,7 +102,7 @@ else:
         train_y = np.reshape(data, [tss, outputsize])
 
     print("Loaded regular arrays; no shuffle")
-    model_name = 'models/' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
+    model_name = 'models/' + activator + '_' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
     print("model_name:", model_name)
 
 # print(train_x.shape)
