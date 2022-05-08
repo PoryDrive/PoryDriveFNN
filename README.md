@@ -64,7 +64,7 @@ There is also an example script supplied [multicapturecli/go.sh](multicapturecli
 `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
 
 #### train2.py
-`python3 train.py <layers> <units per layer> <batches> <activator> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
+`python3 train.py <layers> <units per layer> <batches> <activator> <optimiser: adam,nesterov,etc> <cpu only 1/0>`<br>
 _This is targeted at SELU style networks using many layers with few units for example;_ `python3 train.py 16 32 32 selu nesterov 1`
 
 #### pred.py
