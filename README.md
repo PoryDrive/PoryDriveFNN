@@ -58,6 +58,12 @@ Porydrive in datalogging mode: `./porydrive 0 0 1`
 
 There is also an example script supplied [multicapturecli/go.sh](multicapturecli/go.sh). This script is set to execute 128 processes each time because it is best to stagger the launch of 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launched at the same time.
 
+#### train.py
+`python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
+
+#### pred.py
+`python3 pred.py <model_path>`
+
 ## nan
 
 I've created gigabytes of different datasets at this point using both [/multicapturegui](/multicapturegui) (GUI) and [/multicapturecli](/multicapturecli) (CLI) and this is what you need to know..
