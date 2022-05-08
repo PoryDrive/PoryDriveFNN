@@ -49,7 +49,7 @@
 
 // game logic
 double t = 0;   // time
-f32 dt = 0;  // delta time
+f32 dt = 0;     // delta time
 double timeout = 0; // timeout after
 
 // render state matrices

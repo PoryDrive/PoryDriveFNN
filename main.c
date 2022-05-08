@@ -102,7 +102,7 @@ GLFWwindow* window;
 uint winw = 1024;
 uint winh = 768;
 double t = 0;   // time
-f32 dt = 0;  // delta time
+f32 dt = 0;     // delta time
 double fc = 0;  // frame count
 double lfct = 0;// last frame count time
 double lc = 0;  // logic count
