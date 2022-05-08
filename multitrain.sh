@@ -16,12 +16,7 @@
 
 # done
 
-xterm -e "python3 train.py 4 384 32 nadam 1" &
-xterm -e "python3 train.py 4 384 32 adam 1" &
 xterm -e "python3 train.py 4 384 32 nesterov 1" &
-xterm -e "python3 train.py 4 384 32 sgd 1" &
-
-xterm -e "python3 train.py 4 768 32 nadam 1" &
-xterm -e "python3 train.py 4 768 32 adam 1" &
 xterm -e "python3 train.py 4 768 32 nesterov 1" &
-xterm -e "python3 train.py 4 768 32 sgd 1" &
+xterm -e "python3 train.py 4 768 64 nesterov 1" &
+xterm -e "python3 train.py 4 869 64 nesterov 1" &
