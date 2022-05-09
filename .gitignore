@@ -4,3 +4,4 @@ dataset_size.txt
 numpy_x.npy
 numpy_y.npy
 models/
+*.dat
