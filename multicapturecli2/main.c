@@ -735,6 +735,8 @@ void main_loop()
 
         // randAutoDrive();
 
+        dxi = 0, dyi = 0;
+        round_score = 0.f;
         return;
     }
 
