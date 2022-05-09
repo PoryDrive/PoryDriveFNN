@@ -655,6 +655,10 @@ void main_loop()
 
         dxi = 0, dyi = 0;
         round_score = 0.f;
+
+        char strts[16];
+        timestamp(&strts[0]);
+        printf("[%s] Round took too long, starting new round.\n", strts);
         return;
     }
 
@@ -730,6 +734,8 @@ void main_loop()
         round_start_time = t;
 
         // randAutoDrive();
+
+        return;
     }
 
 //*************************************
@@ -859,142 +865,6 @@ void main_loop()
             round_score = 0.f;
         }
     }
-
-
-
-    //     // input
-    //     int eskip = 0;
-    //     FILE* f = fopen(fnbx, "ab"); // append bytes
-    //     if(f != NULL)
-    //     {
-    //         if(flock(fileno(f), LOCK_EX) == -1)
-    //         {
-    //             fclose(f);
-    //             printf("File lock failed.\n");
-    //             eskip = 1;
-    //         }
-
-    //         size_t r = 0;
-    //         if(isnorm(pbd.x) == 1)
-    //         {
-    //             r += fwrite(&pbd.x, 1, sizeof(f32), f);
-    //         }else{printf("pbd.x not isnorm()\n");}
-    //         if(isnorm(pbd.y) == 1)
-    //         {
-    //             r += fwrite(&pbd.y, 1, sizeof(f32), f);
-    //         }else{printf("pbd.y not isnorm()\n");}
-    //         if(isnorm(lad.x) == 1)
-    //         {
-    //             r += fwrite(&lad.x, 1, sizeof(f32), f);
-    //         }else{printf("lad.x not isnorm()\n");}
-    //         if(isnorm(lad.y) == 1)
-    //         {
-    //             r += fwrite(&lad.y, 1, sizeof(f32), f);
-    //         }else{printf("lad.y not isnorm()\n");}
-    //         if(isnorm(angle) == 1)
-    //         {
-    //             r += fwrite(&angle, 1, sizeof(f32), f);
-    //         }else{printf("angle not isnorm()\n");}
-    //         if(isnorm(dist) == 1)
-    //         {
-    //             r += fwrite(&dist,  1, sizeof(f32), f);
-    //         }else{printf("dist not isnorm()\n");}
-    //         if(r != 24)
-    //         {
-    //             printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes).\n", r);
-    //             if(forceTrim(fnbx, r) < 0)
-    //             {
-    //                 printf("Failed to repair X file. Exiting.\n");
-    //                 rename(fnbx, "dataset_x.dat_dirty");
-    //                 exit(0);
-    //             }
-    //             printf("Repaired.\n");
-    //             eskip = 1;
-    //         }
-
-    //         if(flock(fileno(f), LOCK_UN) == -1)
-    //         {
-    //             fclose(f);
-    //             printf("File unlock failed.\n");
-    //         }
-
-    //         fclose(f);
-    //     }
-    //     else
-    //     {
-    //         printf("Failed to fopen() X file. Skipping Y file.\n");
-    //         eskip = 1; // failed to even open the first file... skip the second
-    //     }
-
-    //     // targets
-    //     if(eskip == 0)
-    //     {
-    //         f = fopen(fnby, "ab"); // append bytes
-    //         if(f != NULL)
-    //         {
-    //             if(flock(fileno(f), LOCK_EX) == -1)
-    //             {
-    //                 fclose(f);
-    //                 printf("File lock failed.\n");
-    //                 if(forceTrim(fnbx, 24) < 0) // targets for this data failed to write, so wipe that
-    //                 {
-    //                     printf("Failed to revert X file. Exiting.\n");
-    //                     rename(fnbx, "dataset_x.dat_dirty");
-    //                     rename(fnby, "dataset_y.dat_dirty");
-    //                     exit(0);
-    //                 }
-    //             }
-
-    //             size_t r = 0;
-    //             if(isnorm(sr) == 1)
-    //             {
-    //                 r += fwrite(&sr,  1, sizeof(f32), f);
-    //             }else{printf("sr not isnorm()\n");}
-    //             if(isnorm(sp) == 1)
-    //             {
-    //                 r += fwrite(&sp,  1, sizeof(f32), f);
-    //             }else{printf("sp not isnorm()\n");}
-    //             if(r != 8)
-    //             {
-    //                 printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
-    //                 if(forceTrim(fnbx, 24) < 0) // targets for this data failed to write, so wipe that too
-    //                 {
-    //                     printf("Failed to revert X file. Exiting.\n");
-    //                     rename(fnbx, "dataset_x.dat_dirty");
-    //                     rename(fnby, "dataset_y.dat_dirty");
-    //                     exit(0);
-    //                 }
-    //                 if(forceTrim(fnby, r) < 0)
-    //                 {
-    //                     printf("Failed to repair Y file. Exiting.\n");
-    //                     rename(fnbx, "dataset_x.dat_dirty");
-    //                     rename(fnby, "dataset_y.dat_dirty");
-    //                     exit(0);
-    //                 }
-    //                 printf("Repaired.\n");
-    //             }
-
-    //             if(flock(fileno(f), LOCK_UN) == -1)
-    //             {
-    //                 fclose(f);
-    //                 printf("File unlock failed.\n");
-    //             }
-
-    //             fclose(f);
-    //         }
-    //         else
-    //         {
-    //             printf("Failed to fopen() Y file. Reverting X write.\n");
-    //             if(forceTrim(fnbx, 24) < 0) // targets for this data failed to write, so wipe that
-    //             {
-    //                 printf("Failed to revert X file. Exiting.\n");
-    //                 rename(fnbx, "dataset_x.dat_dirty");
-    //                 rename(fnby, "dataset_y.dat_dirty");
-    //                 exit(0);
-    //             }
-    //         }
-    //     }
-    // }
 
     // writing the targets to a seperate file makes file io errors more annoying to catch, but it does streamline
     // the process of loading that data into Keras.
