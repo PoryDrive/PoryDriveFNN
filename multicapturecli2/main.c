@@ -3,6 +3,27 @@
         May 2022
 
     Info:
+
+        This version produces scored datasets.
+
+        > distance from porygon at round start : 0 - 36
+            = x * 0.027777778
+
+        > speed of porygon : 0.3 - 1
+            = x
+
+        > twitch radius of porygon : 8 - 16
+            = (x-8) * 0.125
+
+        === average them all for a 0-1 score
+
+        < round time taken (60 seconds max)
+            = x * 0.016666667
+
+        < round collisions (333 max)
+            = x * 0.003003003
+            
+        === average them all and 1 - x for a 0-1 score (higher is better)
     
         Stripped back version of PoryDrive to
         remove any gfx rendering.
@@ -84,6 +105,11 @@ uint auto_drive=0;
     f32 ad_maxspeed_reductor = 0.5f;
 uint neural_drive=0;
 uint dataset_logger=0;
+
+// logging score
+f32 start_dist = 0.f;
+double round_start_time = 0;
+f32 round_score = 0.f;
 
 // porygon vars
 vec zp; // position
@@ -263,8 +289,11 @@ int forceTrim(const char* file, const size_t trim)
     int f = open(file, O_WRONLY);
     if(f > -1)
     {
-        while(flock(f, LOCK_EX) == -1)
-            usleep(1000);
+        if(flock(f, LOCK_EX) == -1)
+        {
+            close(f);
+            printf("forceTrim() File lock failed.\n");
+        }
 
         const size_t len = lseek(f, 0, SEEK_END);
 
@@ -278,8 +307,11 @@ int forceTrim(const char* file, const size_t trim)
                 return -2;
         }
 
-        while(flock(f, LOCK_UN) == -1)
-            usleep(1000);
+        if(flock(f, LOCK_UN) == -1)
+        {
+            close(f);
+            printf("forceTrim() File unlock failed.\n");
+        }
 
         close(f);
     }
@@ -461,6 +493,9 @@ void randGame()
     zt = uRandFloat(8.f, 16.f);
     za = 0.0;
 
+    round_start_time = t;
+    start_dist = vDist(pp, zp);
+
     // randAutoDrive();
 
     auto_drive = 1;
@@ -575,134 +610,7 @@ void main_loop()
             fclose(f);
         }
     }
-    
-    // neural net dataset
-    // input | output
-    // body direction x&y, porygon direction x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
-    if(dataset_logger == 1)
-    {
-        vec lad = pp;
-        vSub(&lad, lad, zp);
-        vNorm(&lad);
-        const f32 angle = vDot(pbd, lad);
-        const f32 dist = vDist(pp, zp);
 
-        // input
-        int eskip = 0;
-        FILE* f = fopen("dataset_x.dat", "ab"); // append bytes
-        if(f != NULL)
-        {
-            while(flock(fileno(f), LOCK_EX) == -1)
-                usleep(1000);
-
-            size_t r = 0;
-            if(isnorm(pbd.x) == 1)
-            {
-                r += fwrite(&pbd.x, 1, sizeof(f32), f);
-            }else{printf("pbd.x not isnorm()\n");}
-            if(isnorm(pbd.y) == 1)
-            {
-                r += fwrite(&pbd.y, 1, sizeof(f32), f);
-            }else{printf("pbd.y not isnorm()\n");}
-            if(isnorm(lad.x) == 1)
-            {
-                r += fwrite(&lad.x, 1, sizeof(f32), f);
-            }else{printf("lad.x not isnorm()\n");}
-            if(isnorm(lad.y) == 1)
-            {
-                r += fwrite(&lad.y, 1, sizeof(f32), f);
-            }else{printf("lad.y not isnorm()\n");}
-            if(isnorm(angle) == 1)
-            {
-                r += fwrite(&angle, 1, sizeof(f32), f);
-            }else{printf("angle not isnorm()\n");}
-            if(isnorm(dist) == 1)
-            {
-                r += fwrite(&dist,  1, sizeof(f32), f);
-            }else{printf("dist not isnorm()\n");}
-            if(r != 24)
-            {
-                printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes).\n", r);
-                if(forceTrim("dataset_x.dat", r) < 0)
-                {
-                    printf("Failed to repair X file. Exiting.\n");
-                    rename("dataset_x.dat", "dataset_x.dat_dirty");
-                    exit(0);
-                }
-                printf("Repaired.\n");
-                eskip = 1;
-            }
-
-            while(flock(fileno(f), LOCK_UN) == -1)
-                usleep(1000);
-
-            fclose(f);
-        }
-        else
-        {
-            printf("Failed to fopen() X file. Skipping Y file.\n");
-            eskip = 1; // failed to even open the first file... skip the second
-        }
-
-        // targets
-        if(eskip == 0)
-        {
-            f = fopen("dataset_y.dat", "ab"); // append bytes
-            if(f != NULL)
-            {
-                while(flock(fileno(f), LOCK_EX) == -1)
-                    usleep(1000);
-
-                size_t r = 0;
-                if(isnorm(sr) == 1)
-                {
-                    r += fwrite(&sr,  1, sizeof(f32), f);
-                }else{printf("sr not isnorm()\n");}
-                if(isnorm(sp) == 1)
-                {
-                    r += fwrite(&sp,  1, sizeof(f32), f);
-                }else{printf("sp not isnorm()\n");}
-                if(r != 8)
-                {
-                    printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
-                    if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that too
-                    {
-                        printf("Failed to revert X file. Exiting.\n");
-                        rename("dataset_x.dat", "dataset_x.dat_dirty");
-                        rename("dataset_y.dat", "dataset_y.dat_dirty");
-                        exit(0);
-                    }
-                    if(forceTrim("dataset_y.dat", r) < 0)
-                    {
-                        printf("Failed to repair Y file. Exiting.\n");
-                        rename("dataset_x.dat", "dataset_x.dat_dirty");
-                        rename("dataset_y.dat", "dataset_y.dat_dirty");
-                        exit(0);
-                    }
-                    printf("Repaired.\n");
-                }
-
-                while(flock(fileno(f), LOCK_UN) == -1)
-                    usleep(1000);
-
-                fclose(f);
-            }
-            else
-            {
-                printf("Failed to fopen() Y file. Reverting X write.\n");
-                if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that
-                {
-                    printf("Failed to revert X file. Exiting.\n");
-                    rename("dataset_x.dat", "dataset_x.dat_dirty");
-                    rename("dataset_y.dat", "dataset_y.dat_dirty");
-                    exit(0);
-                }
-            }
-        }
-    }
-
-    // writing the targets to a seperate file makes file io errors more annoying to catch, but it does streamline
-    // the process of loading that data into Keras.
 
 //*************************************
 // simulate car
@@ -780,6 +688,22 @@ void main_loop()
             char strts[16];
             timestamp(&strts[0]);
             printf("[%s] Porygon collected: %u, collisions: %u\n", strts, cp, cc);
+            const double roundtime = t-round_start_time;
+            if(cc <= 333 && roundtime <= 60.0)
+            {
+                const f32 score_startdist = start_dist*0.027777778f;
+                const f32 score_poryspeed = zs;
+                const f32 score_porytwitch= (zt-8.f) * 0.125f;
+                const f32 score_timetaken = 1.f-(f32)(roundtime * 0.003003003);
+                const f32 score_collisions= 1.f-(((f32)cc)*0.003003003f);
+                round_score = (score_startdist + score_poryspeed + score_porytwitch + score_timetaken + score_collisions) / 5.f;
+                printf("[%s] %g %g %g %g %g : %g\n", strts, score_startdist, score_poryspeed, score_porytwitch, score_timetaken, score_collisions, round_score);
+            }
+            else
+            {
+                round_score = 0.f;
+                printf("[%s] This round did not qualify for logging. %g Round Time.\n", strts, roundtime);
+            }
             cc = 0;
         }
     }
@@ -790,8 +714,169 @@ void main_loop()
         zt = uRandFloat(8.f, 16.f);
         za = 0.0;
 
+        start_dist = vDist(pp, zp);
+        round_start_time = t;
+
         // randAutoDrive();
     }
+
+//*************************************
+// dataset logging
+//*************************************
+
+    // neural net dataset
+    // input | output
+    // body direction x&y, porygon direction x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
+    // if(dataset_logger == 1 && round_score > 0.f)
+    // {
+    //     vec lad = pp;
+    //     vSub(&lad, lad, zp);
+    //     vNorm(&lad);
+    //     const f32 angle = vDot(pbd, lad);
+    //     const f32 dist = vDist(pp, zp);
+
+    //     char fnbx[256];
+    //     sprintf(fnbx, "%f.1_x.dat", round_score);
+
+    //     char fnby[256];
+    //     sprintf(fnby, "%f.1_y.dat", round_score);
+
+    //     // input
+    //     int eskip = 0;
+    //     FILE* f = fopen(fnbx, "ab"); // append bytes
+    //     if(f != NULL)
+    //     {
+    //         if(flock(fileno(f), LOCK_EX) == -1)
+    //         {
+    //             fclose(f);
+    //             printf("File lock failed.\n");
+    //             eskip = 1;
+    //         }
+
+    //         size_t r = 0;
+    //         if(isnorm(pbd.x) == 1)
+    //         {
+    //             r += fwrite(&pbd.x, 1, sizeof(f32), f);
+    //         }else{printf("pbd.x not isnorm()\n");}
+    //         if(isnorm(pbd.y) == 1)
+    //         {
+    //             r += fwrite(&pbd.y, 1, sizeof(f32), f);
+    //         }else{printf("pbd.y not isnorm()\n");}
+    //         if(isnorm(lad.x) == 1)
+    //         {
+    //             r += fwrite(&lad.x, 1, sizeof(f32), f);
+    //         }else{printf("lad.x not isnorm()\n");}
+    //         if(isnorm(lad.y) == 1)
+    //         {
+    //             r += fwrite(&lad.y, 1, sizeof(f32), f);
+    //         }else{printf("lad.y not isnorm()\n");}
+    //         if(isnorm(angle) == 1)
+    //         {
+    //             r += fwrite(&angle, 1, sizeof(f32), f);
+    //         }else{printf("angle not isnorm()\n");}
+    //         if(isnorm(dist) == 1)
+    //         {
+    //             r += fwrite(&dist,  1, sizeof(f32), f);
+    //         }else{printf("dist not isnorm()\n");}
+    //         if(r != 24)
+    //         {
+    //             printf("Outch, just wrote corrupted bytes to dataset_x! (last %zu bytes).\n", r);
+    //             if(forceTrim(fnbx, r) < 0)
+    //             {
+    //                 printf("Failed to repair X file. Exiting.\n");
+    //                 rename(fnbx, "dataset_x.dat_dirty");
+    //                 exit(0);
+    //             }
+    //             printf("Repaired.\n");
+    //             eskip = 1;
+    //         }
+
+    //         if(flock(fileno(f), LOCK_UN) == -1)
+    //         {
+    //             fclose(f);
+    //             printf("File unlock failed.\n");
+    //         }
+
+    //         fclose(f);
+    //     }
+    //     else
+    //     {
+    //         printf("Failed to fopen() X file. Skipping Y file.\n");
+    //         eskip = 1; // failed to even open the first file... skip the second
+    //     }
+
+    //     // targets
+    //     if(eskip == 0)
+    //     {
+    //         f = fopen(fnby, "ab"); // append bytes
+    //         if(f != NULL)
+    //         {
+    //             if(flock(fileno(f), LOCK_EX) == -1)
+    //             {
+    //                 fclose(f);
+    //                 printf("File lock failed.\n");
+    //                 if(forceTrim(fnbx, 24) < 0) // targets for this data failed to write, so wipe that
+    //                 {
+    //                     printf("Failed to revert X file. Exiting.\n");
+    //                     rename(fnbx, "dataset_x.dat_dirty");
+    //                     rename(fnby, "dataset_y.dat_dirty");
+    //                     exit(0);
+    //                 }
+    //             }
+
+    //             size_t r = 0;
+    //             if(isnorm(sr) == 1)
+    //             {
+    //                 r += fwrite(&sr,  1, sizeof(f32), f);
+    //             }else{printf("sr not isnorm()\n");}
+    //             if(isnorm(sp) == 1)
+    //             {
+    //                 r += fwrite(&sp,  1, sizeof(f32), f);
+    //             }else{printf("sp not isnorm()\n");}
+    //             if(r != 8)
+    //             {
+    //                 printf("Outch, just wrote corrupted bytes to dataset_y! (last %zu bytes).\n", r);
+    //                 if(forceTrim(fnbx, 24) < 0) // targets for this data failed to write, so wipe that too
+    //                 {
+    //                     printf("Failed to revert X file. Exiting.\n");
+    //                     rename(fnbx, "dataset_x.dat_dirty");
+    //                     rename(fnby, "dataset_y.dat_dirty");
+    //                     exit(0);
+    //                 }
+    //                 if(forceTrim(fnby, r) < 0)
+    //                 {
+    //                     printf("Failed to repair Y file. Exiting.\n");
+    //                     rename(fnbx, "dataset_x.dat_dirty");
+    //                     rename(fnby, "dataset_y.dat_dirty");
+    //                     exit(0);
+    //                 }
+    //                 printf("Repaired.\n");
+    //             }
+
+    //             if(flock(fileno(f), LOCK_UN) == -1)
+    //             {
+    //                 fclose(f);
+    //                 printf("File unlock failed.\n");
+    //             }
+
+    //             fclose(f);
+    //         }
+    //         else
+    //         {
+    //             printf("Failed to fopen() Y file. Reverting X write.\n");
+    //             if(forceTrim(fnbx, 24) < 0) // targets for this data failed to write, so wipe that
+    //             {
+    //                 printf("Failed to revert X file. Exiting.\n");
+    //                 rename(fnbx, "dataset_x.dat_dirty");
+    //                 rename(fnby, "dataset_y.dat_dirty");
+    //                 exit(0);
+    //             }
+    //         }
+    //     }
+    // }
+
+    // writing the targets to a seperate file makes file io errors more annoying to catch, but it does streamline
+    // the process of loading that data into Keras.
 
 //*************************************
 // main render
@@ -817,7 +902,7 @@ int main(int argc, char** argv)
 {
     // help
     printf("----\n");
-    printf("PoryDriveCli\n");
+    printf("PoryDriveCli_scored\n");
     printf("James William Fletcher (james@voxdsp.com)\n");
     printf("This is the CLI trainer. No GFX. CPU Bound.\n");
     printf("----\n");
@@ -844,6 +929,7 @@ int main(int argc, char** argv)
     useconds_t wait = wait_interval;
 
     // init
+    t = glfwGetTime();
     configScarletFast();
     randGame();
 
