@@ -74,13 +74,7 @@ The main difference between CLI and GUI dataset aggregation:
 
 It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
 
-CLI2 generates scored datasets, the higher the score the better performing the dataset.
-
-## nan
-
-I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
-
-It's just worth keeping this in mind if your dataset starts producing a NaN loss when training with it. I am not completely sure why this is yet, I am checking that the CLI processes do not write NaN floats to the dataset _(before they are written)_, I check for any write corruption to the extent that I can in real-time which is just that the number of bytes written is correct. It is possible that the high frequency and resource demanding nature of the CLI processes all running at once could be causing bytes to be miss-written to file creating NaN's in the dataset, checking the bytes after writing them could detect this and is an option that comes at a cost to performance but one I will probably be adding.
+CLI generates scored datasets, the higher the score the better performing the dataset.
 
 ## config
 It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car physics variables.
