@@ -569,43 +569,43 @@ void main_loop()
     }
 
     // neural net
-    if(neural_drive == 1) // Feed-Forward Neural Network (FNN)
-    {
-        vec lad = pp;
-        vSub(&lad, lad, zp);
-        vNorm(&lad);
-        const f32 angle = vDot(pbd, lad);
-        const f32 dist = vDist(pp, zp);
+    // if(neural_drive == 1) // Feed-Forward Neural Network (FNN)
+    // {
+    //     vec lad = pp;
+    //     vSub(&lad, lad, zp);
+    //     vNorm(&lad);
+    //     const f32 angle = vDot(pbd, lad);
+    //     const f32 dist = vDist(pp, zp);
 
-        const float input[6] = {pbd.x, pbd.y, lad.x, lad.y, angle, dist};
+    //     const float input[6] = {pbd.x, pbd.y, lad.x, lad.y, angle, dist};
 
-        // write input to file
-        FILE *f = fopen("/dev/shm/porydrive_input.dat", "wb");
-        if(f != NULL)
-        {
-            const size_t wbs = 6 * sizeof(float);
-            if(fwrite(input, 1, wbs, f) != wbs)
-                printf("ERROR: neural write failed.\n");
-            fclose(f);
-        }
+    //     // write input to file
+    //     FILE *f = fopen("/dev/shm/porydrive_input.dat", "wb");
+    //     if(f != NULL)
+    //     {
+    //         const size_t wbs = 6 * sizeof(float);
+    //         if(fwrite(input, 1, wbs, f) != wbs)
+    //             printf("ERROR: neural write failed.\n");
+    //         fclose(f);
+    //     }
 
-        // load last result
-        float ret[2];
-        f = fopen("/dev/shm/porydrive_r.dat", "rb");
-        if(f != NULL)
-        {
-            if(fread(&ret, 2, sizeof(float), f) == sizeof(float))
-            {
-                if(isnorm(ret[0]) == 1 && isnorm(ret[1]) == 1)
-                {
-                    // set new vars
-                    sr = ret[0];
-                    sp = ret[1];
-                }
-            }
-            fclose(f);
-        }
-    }
+    //     // load last result
+    //     float ret[2];
+    //     f = fopen("/dev/shm/porydrive_r.dat", "rb");
+    //     if(f != NULL)
+    //     {
+    //         if(fread(&ret, 2, sizeof(float), f) == sizeof(float))
+    //         {
+    //             if(isnorm(ret[0]) == 1 && isnorm(ret[1]) == 1)
+    //             {
+    //                 // set new vars
+    //                 sr = ret[0];
+    //                 sp = ret[1];
+    //             }
+    //         }
+    //         fclose(f);
+    //     }
+    // }
 
 
 //*************************************
