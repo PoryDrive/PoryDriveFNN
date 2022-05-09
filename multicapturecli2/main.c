@@ -641,6 +641,23 @@ void main_loop()
 // simulate porygon
 //*************************************
 
+    // new round if timelimit exceeded
+    const double roundtime = t-round_start_time;
+    if(roundtime >= 60.0)
+    {
+        zp = (vec){uRandFloat(-18.f, 18.f), uRandFloat(-18.f, 18.f), 0.f};
+        zs = uRandFloat(0.3f, 1.f);
+        zt = uRandFloat(8.f, 16.f);
+        za = 0.0;
+
+        start_dist = vDist(pp, zp);
+        round_start_time = t;
+
+        dxi = 0, dyi = 0;
+        round_score = 0.f;
+        return;
+    }
+
     if(za == 0.0)
     {
         vec inc;
@@ -684,7 +701,6 @@ void main_loop()
             char strts[16];
             timestamp(&strts[0]);
             printf("[%s] Porygon collected: %u, collisions: %u\n", strts, cp, cc);
-            const double roundtime = t-round_start_time;
             if(cc <= 333 && roundtime <= 60.0)
             {
                 const f32 score_startdist = start_dist*0.027777778f;
