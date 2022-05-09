@@ -19,13 +19,9 @@ Then run `./porydrive` and press `I` to enter Neural Drive mode.
 
 ## info
 
-I have excluded the dataset files because they are huge, at the time of writing this I use a 1GB `dataset_x.dat`. The best way to produce your own is to use [/multicapturegui](/multicapturegui) and then execute [/multicapture/cat.sh](/multicapture/cat.sh) to concatenate them all into one file. Run each `go.sh` file in each respective folder in [/multicapture](/multicapture) for a few hours, then close them all, once the datasets are not being written to anymore run `cat.sh` to do the concatenation. `combmain.sh` will concatenate any datasets in the root folder, and then overwrite the dataset in the root folder with the new dataset.
-
-It is much more efficient to make a dataset using [/multicapturecli](/multicapturecli) which is a multi-process model with file locking so that no concatenation aggregation is needed. You can run more instances than the gui version and specify how many rounds each should play before safely exiting. Do not manually terminate the processes or it could lead to dataset corruption.
-
 Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
-I've trained a lot of models at this point and most of the ones I liked are in [PoryDriveFNN_models/original/ADAM](https://github.com/PoryDrive/PoryDriveFNN_models/tree/main/original/ADAM) and are of varying sizes and topologies. There are also some [SGD models](https://github.com/PoryDrive/PoryDriveFNN_models/original/SGD) I liked. But after much experimenting I have finally settled on the Nesterov accelerated gradient being the best option to train with for this purpose. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1`.
+Trained models are kept in a seperate repository; [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models). Nesterov optimiser and tanh activation functions seem to work best for this purpose. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1` or `python3 train2.py 16 32 32 tanh nesterov 1`.
 
 A 1GB dataset to train a 4 layer network with 384-869 _(384 is my preferred)_ units per layer _(top-down so technically less as each layer reduces the units by a factor of two.)_ and batches set at 32 _(because the sample rate is 144 times per second that is roughly one batch per just less than one quater of a second of data. You could push this to 64 for faster training but I always find 32 batches produces a slightly better network)_ these networks are relatively fast to train, can be trained concurrently on multiple CPU's and are what I consider to be the "sweet spot". Trained with Nesterov accelerated gradient as mentioned above.
 
@@ -70,17 +66,19 @@ _train2.py targeted at SELU style networks using many layers with few units._<br
 #### pred.py
 `python3 pred.py <model_path>`
 
-## nan
-
-I've created gigabytes of different datasets at this point using both [/multicapturegui](/multicapturegui) (GUI) and [/multicapturecli](/multicapturecli) (CLI) and this is what you need to know..
-
-I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
+## datasets
 
 The main difference between CLI and GUI dataset aggregation:
 - **GUI:** ~1GB dataset takes 10 hours using 10 processes running simultaneously.
 - **CLI:** ~1GB dataset takes 10 minutes using 600 processes running simultaneously.
 
 It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
+
+CLI2 generates scored datasets, the higher the score the better performing the dataset.
+
+## nan
+
+I can generate a dataset using CLI of almost 1GB and usually it will train just fine, but some times and more often when I approach 1GB the training process will start to [NaN](https://en.wikipedia.org/wiki/NaN). But, if I create datasets using GUI I have not noticed this happen yet, so far I have created datasets up to 2GB this way.
 
 It's just worth keeping this in mind if your dataset starts producing a NaN loss when training with it. I am not completely sure why this is yet, I am checking that the CLI processes do not write NaN floats to the dataset _(before they are written)_, I check for any write corruption to the extent that I can in real-time which is just that the number of bytes written is correct. It is possible that the high frequency and resource demanding nature of the CLI processes all running at once could be causing bytes to be miss-written to file creating NaN's in the dataset, checking the bytes after writing them could detect this and is an option that comes at a cost to performance but one I will probably be adding.
 
