@@ -780,8 +780,8 @@ void main_loop()
             dataset_x[dxi++] = dist;
 
             // log y
-            dataset_x[dyi++] = sr;
-            dataset_x[dyi++] = sp;
+            dataset_y[dyi++] = sr;
+            dataset_y[dyi++] = sp;
         }
 
         // write log buffer to file
@@ -824,7 +824,7 @@ void main_loop()
 
             if(eskip == 0)
             {
-                FILE* f = fopen(fnby, "ab"); // append bytes
+                f = fopen(fnby, "ab"); // append bytes
                 if(f != NULL)
                 {
                     if(flock(fileno(f), LOCK_EX) == -1)
