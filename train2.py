@@ -102,7 +102,7 @@ else:
         train_y = np.reshape(data, [tss, outputsize])
 
     print("Loaded regular arrays; no shuffle")
-    model_name = 'models/' + activator + '_' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_shuf'
+    model_name = 'models/' + activator + '_' + optimiser + '_' + sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3]
     print("model_name:", model_name)
 
 # print(train_x.shape)
