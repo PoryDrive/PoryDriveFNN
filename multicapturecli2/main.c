@@ -69,8 +69,8 @@
 //*************************************
 
 // game logic
-double t = 0;   // time
-f32 dt = 0;     // delta time
+double t = 0; // time
+f32 dt = 0;   // delta time
 double timeout = 0; // timeout after
 
 // render state matrices
@@ -107,6 +107,12 @@ uint neural_drive=0;
 uint dataset_logger=0;
 
 // logging score
+#define XMAX 57024
+float dataset_x[XMAX];
+uint dxi = 0;
+#define YMAX 19008
+float dataset_y[YMAX];
+uint dyi = 0;
 f32 start_dist = 0.f;
 double round_start_time = 0;
 f32 round_score = 0.f;
@@ -289,29 +295,19 @@ int forceTrim(const char* file, const size_t trim)
     int f = open(file, O_WRONLY);
     if(f > -1)
     {
-        if(flock(f, LOCK_EX) == -1)
-        {
-            close(f);
-            printf("forceTrim() File lock failed.\n");
-        }
+        while(flock(f, LOCK_EX) == -1)
+            usleep(1000);
 
         const size_t len = lseek(f, 0, SEEK_END);
 
-        uint c = 0;
-        while(ftruncate(f, len-trim) == -1)
+        if(ftruncate(f, len-trim) == -1)
         {
             close(f);
-            f = open(file, O_WRONLY);
-            c++;
-            if(c > 333)
-                return -2;
+            return -1;
         }
 
-        if(flock(f, LOCK_UN) == -1)
-        {
-            close(f);
-            printf("forceTrim() File unlock failed.\n");
-        }
+        while(flock(f, LOCK_UN) == -1)
+            usleep(1000);
 
         close(f);
     }
@@ -725,21 +721,130 @@ void main_loop()
 //*************************************
 
     // neural net dataset
-    // input | output
-    // body direction x&y, porygon direction x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
-    // if(dataset_logger == 1 && round_score > 0.f)
-    // {
-    //     vec lad = pp;
-    //     vSub(&lad, lad, zp);
-    //     vNorm(&lad);
-    //     const f32 angle = vDot(pbd, lad);
-    //     const f32 dist = vDist(pp, zp);
+    if(dataset_logger == 1)
+    {
+        vec lad = pp;
+        vSub(&lad, lad, zp);
+        vNorm(&lad);
+        const f32 angle = vDot(pbd, lad);
+        const f32 dist = vDist(pp, zp);
 
-    //     char fnbx[256];
-    //     sprintf(fnbx, "%f.1_x.dat", round_score);
+        uint fail = 0;
+        if(isnorm(pbd.x) == 0){fail++;}
+        if(isnorm(pbd.y) == 0){fail++;}
+        if(isnorm(lad.x) == 0){fail++;}
+        if(isnorm(lad.y) == 0){fail++;}
+        if(isnorm(angle) == 0){fail++;}
+        if(isnorm(dist) == 0){fail++;}
+        if(isnorm(sr) == 0){fail++;}
+        if(isnorm(sp) == 0){fail++;}
 
-    //     char fnby[256];
-    //     sprintf(fnby, "%f.1_y.dat", round_score);
+        if(dxi >= XMAX-1 || dyi >= YMAX-1)
+        {
+            fail = 1;
+            printf("Dataset log buffers are full, this should never happen.\n");
+        }
+
+        if(fail == 0)
+        {
+            // log x
+            dataset_x[dxi++] = pbd.x;
+            dataset_x[dxi++] = pbd.y;
+            dataset_x[dxi++] = lad.x;
+            dataset_x[dxi++] = lad.y;
+            dataset_x[dxi++] = angle;
+            dataset_x[dxi++] = dist;
+
+            // log y
+            dataset_x[dyi++] = sr;
+            dataset_x[dyi++] = sp;
+        }
+
+        // write log buffer to file
+        if(round_score > 0.f && dxi > 0 && dyi > 0)
+        {
+            int eskip = 0;
+
+            char fnbx[256];
+            sprintf(fnbx, "%.1f_x.dat", round_score);
+            char fnby[256];
+            sprintf(fnby, "%.1f_y.dat", round_score);
+
+            FILE* f = fopen(fnbx, "ab"); // append bytes
+            if(f != NULL)
+            {
+                if(flock(fileno(f), LOCK_EX) == -1)
+                    usleep(1000);
+
+                const size_t wb = fwrite(&dataset_x[0], sizeof(f32), dxi, f);
+                if(wb != dxi)
+                {
+                    printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb);
+                    if(forceTrim(fnbx, wb*sizeof(f32)) < 0)
+                    {
+                        printf("Failed to repair X file. Exiting.\n");
+                        char fnbx_dirty[512];
+                        sprintf(fnbx_dirty, "%s_dirty", fnbx);
+                        rename(fnbx, fnbx_dirty);
+                        exit(0);
+                    }
+                    printf("Repaired.\n");
+                    eskip = 1;
+                }
+
+                if(flock(fileno(f), LOCK_UN) == -1)
+                    usleep(1000);
+
+                fclose(f);
+            }
+
+            if(eskip == 0)
+            {
+                FILE* f = fopen(fnby, "ab"); // append bytes
+                if(f != NULL)
+                {
+                    if(flock(fileno(f), LOCK_EX) == -1)
+                        usleep(1000);
+
+                    const size_t wb = fwrite(&dataset_y[0], sizeof(f32), dyi, f);
+                    if(wb != dyi)
+                    {
+                        printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb);
+                        if(forceTrim(fnby, wb*sizeof(f32)) < 0)
+                        {
+                            printf("Failed to repair X file. Exiting.\n");
+                            char fnby_dirty[512];
+                            sprintf(fnby_dirty, "%s_dirty", fnby);
+                            rename(fnby, fnby_dirty);
+                            exit(0);
+                        }
+                        printf("Repaired.\n");
+                    }
+
+                    if(flock(fileno(f), LOCK_UN) == -1)
+                        usleep(1000);
+
+                    fclose(f);
+                }
+                else
+                {
+                    if(forceTrim(fnbx, 24) < 0)
+                    {
+                        printf("Failed to repair X file. Exiting.\n");
+                        char fnbx_dirty[512];
+                        sprintf(fnbx_dirty, "%s_dirty", fnbx);
+                        rename(fnbx, fnbx_dirty);
+                        exit(0);
+                    }
+                }
+            }
+
+            dxi = 0, dyi = 0;
+            round_score = 0.f;
+        }
+    }
+
+
 
     //     // input
     //     int eskip = 0;

@@ -48,8 +48,8 @@
 //*************************************
 
 // game logic
-double t = 0;   // time
-f32 dt = 0;     // delta time
+double t = 0; // time
+f32 dt = 0;   // delta time
 double timeout = 0; // timeout after
 
 // render state matrices
@@ -268,14 +268,10 @@ int forceTrim(const char* file, const size_t trim)
 
         const size_t len = lseek(f, 0, SEEK_END);
 
-        uint c = 0;
-        while(ftruncate(f, len-trim) == -1)
+        if(ftruncate(f, len-trim) == -1)
         {
             close(f);
-            f = open(file, O_WRONLY);
-            c++;
-            if(c > 333)
-                return -2;
+            return -1;
         }
 
         while(flock(f, LOCK_UN) == -1)
