@@ -803,7 +803,7 @@ void main_loop()
                 const size_t wb = fwrite(&dataset_x[0], sizeof(f32), dxi, f);
                 if(wb != dxi)
                 {
-                    printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb);
+                    printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb*sizeof(f32));
                     if(forceTrim(fnbx, wb*sizeof(f32)) < 0)
                     {
                         printf("Failed to repair X file. Exiting.\n");
@@ -833,7 +833,7 @@ void main_loop()
                     const size_t wb = fwrite(&dataset_y[0], sizeof(f32), dyi, f);
                     if(wb != dyi)
                     {
-                        printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb);
+                        printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb*sizeof(f32));
                         if(forceTrim(fnby, wb*sizeof(f32)) < 0)
                         {
                             printf("Failed to repair X file. Exiting.\n");
