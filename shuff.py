@@ -44,9 +44,11 @@ with open("dataset_y.dat", 'rb') as f:
 print("Shuffling...")
 shuffle_in_unison(train_x, train_y)
 
-print("Saving...")
-np.save("numpy_x.npy", train_x)
-np.save("numpy_y.npy", train_y)
+print("NaN's detected:", np.count_nonzero(np.isnan(data)))
+
+print("Saving & Zeroing NaN's...")
+np.save("numpy_x.npy", np.nan_to_num(train_x))
+np.save("numpy_y.npy", np.nan_to_num(train_y))
 
 timetaken = (time_ns()-st)/1e+9
 print("Time Taken:", "{:.2f}".format(timetaken), "seconds")
