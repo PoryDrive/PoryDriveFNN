@@ -89,7 +89,7 @@ The main difference between CLI and GUI dataset aggregation:
 - **GUI:** ~1GB dataset takes 10 hours using 10 processes running simultaneously.
 - **CLI:** ~1GB dataset takes 10 minutes using 600 processes running simultaneously.
 
-It is much easier to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
+It is more efficient to create more CLI processes on one machine than GUI processes because they are much more light weight and require no communication with a Graphics Processing Unit (GPU).
 
 CLI generates scored datasets, the higher the score the better performing the dataset.
 
