@@ -53,6 +53,7 @@ Porydrive in datalogging mode: `./porydrive 0 0 1`
 #### porydrivecli
 - The first command line parameter is the amount of rounds to execute, `cd multicapturecli;./porydrive 8;`, for example, would execute one process for 8 rounds.
 - The second command line parameter is the amount of seconds before the process times out, e.g 8 rounds and timeout after 33 seconds, `cd multicapturecli;./porydrive 8 33;`.
+- The third command line parameter is the minimum score to log, if I set this to 0.9 it will only save datasets 0.9 and 1.0 to file; `cd multicapturecli;./porydrive 8 33 0.9;`
 
 There is also an example script supplied [multicapturecli/go.sh](multicapturecli/go.sh). This script is set to execute 128 processes each time because it is best to stagger the launch of 600+ processes in batches running `go.sh` multiple times otherwise they will all lag and quit all at once if all launched at the same time.
 

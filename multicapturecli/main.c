@@ -116,6 +116,7 @@ uint dyi = 0;
 f32 start_dist = 0.f;
 double round_start_time = 0;
 f32 round_score = 0.f;
+f32 minscore = 0.f;
 
 // porygon vars
 vec zp; // position
@@ -785,7 +786,7 @@ void main_loop()
         }
 
         // write log buffer to file
-        if(round_score > 0.f && dxi > 0 && dyi > 0)
+        if(round_score >= minscore && dxi > 0 && dyi > 0)
         {
             int eskip = 0;
 
@@ -909,6 +910,8 @@ int main(int argc, char** argv)
     if(argc >= 2){mcp = atoi(argv[1]);}
     timeout = 0;
     if(argc >= 3){timeout = atof(argv[2]);}
+    minscore = 0.f;
+    if(argc >= 4){minscore = atof(argv[3]);}
     printf("Running for %u rounds with a timeout of %g seconds.\n----\n", mcp, timeout);
 
     // i did consider threading this, and having a log buffer
