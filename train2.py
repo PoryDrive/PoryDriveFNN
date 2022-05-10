@@ -70,13 +70,6 @@ if not isdir('models'): mkdir('models')
 tss = int(os.stat("dataset_y.dat").st_size / 8)
 print("Dataset Size:", "{:,}".format(tss))
 
-# helpers (https://stackoverflow.com/questions/4601373/better-way-to-shuffle-two-numpy-arrays-in-unison)
-def shuffle_in_unison(a, b):
-    rng_state = np.random.get_state()
-    np.random.shuffle(a)
-    np.random.set_state(rng_state)
-    np.random.shuffle(b)
-
 ##########################################
 #   LOAD DATA
 ##########################################
