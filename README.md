@@ -1,5 +1,5 @@
 # PoryDriveFNN
-A Feed-Forward Neural Network trained by a classical autonomous AI.
+A Feed-Forward Neural Network trained by supervised learning.
 
 [![Screenshot of the PoryDrive game](https://raw.githubusercontent.com/mrbid/porydrive/main/screenshot.png)](https://www.youtube.com/watch?v=EoPIzxVX-9E "PoryDrive Game Video")
 
