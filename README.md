@@ -15,7 +15,7 @@ The hope is that by creaming off the top scored datasets that the minimum collis
 
 ## how
 
-Create a dataset using [/multicapturecli](/multicapturecli) _(I've already trained so many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you don't really need to aggregate a dataset to train your own)_.
+Create a dataset using [/multicapturecli](/multicapturecli) _(I've already trained many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you may not need to aggregate a dataset to train your own)_.
 
 - [`shuff.py`](shuff.py) - _(optional but recommended)_ shuffle the dataset & zeros any [NaN's](https://en.wikipedia.org/wiki/NaN).
 - [`train.py`](train.py) - train a model from the dataset `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
