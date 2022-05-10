@@ -11,7 +11,7 @@ Focused on using Tensorflow Keras on Linux. Training and gameplay has been set t
 
 With the dataset generation I am trying to aggregate rounds into specific buckets of performance and this performance is dictated by an overal score expressed as a normal 0-1 floating point number. This score is created at the end of each round upon having collected a Porygon. The score is defined by five factors; the distance the porygon started from the car at the beginning of the round, the speed the porygon was moving at, the speed the porygon was changing direction, the total length of time the round took, and the total amount of collisions that took place during the round.
 
-The hope is that by creaming off the top scored datasets that the minimum collisions per round for the highest distances from the porygon at the round start will be isolated and thus creating a dataset that is more likely to be able to infer _(or well avoid)_ the existance of the obstacles without actually explicitly being told about them in the training data.
+The hope is that by creaming off the top scored datasets that the minimum collisions per round for the highest distances from the porygon at the round start will be isolated and thus creating a dataset that is more likely to be able to infer _(or well avoid)_ the existance of the obstacles without the network actually explicitly being told about them in the training data.
 
 ## how
 
