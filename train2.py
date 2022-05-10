@@ -124,9 +124,10 @@ model = Sequential()
 model.add(Dense(layer_units, activation=activator, input_dim=inputsize))
 
 for x in range(layers):
+    # model.add(Dropout(.3))
     model.add(Dense(layer_units, activation=activator))
 
-# model.add(Dropout(.2))
+# model.add(Dropout(.3))
 model.add(Dense(outputsize, activation='tanh'))
 
 # output summary
