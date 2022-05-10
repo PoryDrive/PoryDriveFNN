@@ -47,9 +47,6 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
-#include <X11/Xlib.h>
-#include <X11/extensions/Xrandr.h>
-
 //#define uint GLushort
 #define sint short
 #define f32 float
