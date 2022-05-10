@@ -1,1 +1,1 @@
-for i in {1..512}; do nohup ./porydrivecli 2400 2400 > /dev/null 2>&1 & done
+for i in {1..1024}; do nohup ./porydrivecli 32400 32400 > /dev/null 2>&1 & done
