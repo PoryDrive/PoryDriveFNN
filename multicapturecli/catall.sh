@@ -1,0 +1,2 @@
+cat 0.0_x.dat 0.1_x.dat 0.2_x.dat 0.3_x.dat 0.4_x.dat 0.5_x.dat 0.6_x.dat 0.7_x.dat 0.8_x.dat 0.9_x.dat 1.0_x.dat > dataset_x.dat
+cat 0.0_y.dat 0.1_y.dat 0.2_y.dat 0.3_y.dat 0.4_y.dat 0.5_y.dat 0.6_y.dat 0.7_y.dat 0.8_y.dat 0.9_y.dat 1.0_y.dat > dataset_y.dat
