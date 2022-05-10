@@ -35,7 +35,7 @@ It is possible to train datasets using [/multicapturegui](/multicapturegui) or `
 
 I have locked training and replaying of neural models to the ScarletFast car physics configuration as this has more flexible handling.
 
-Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
+Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. It may be worth checking the expected time taken for both CPU and GPU bound training before committing. Consider removing the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
 Trained models are kept in a seperate repository; [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models). Nesterov optimiser and tanh activation functions seem to work best for this purpose. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1` or `python3 train2.py 16 32 32 tanh nesterov 1`.
 
