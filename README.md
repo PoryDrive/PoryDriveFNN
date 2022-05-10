@@ -9,13 +9,17 @@ Focused on using Tensorflow Keras on Linux. Training and gameplay has been set t
 
 ## how
 
-Create a dataset using [/multicapturecli](/multicapturecli) or [/multicapturegui](/multicapturegui) or `./porydrive` and press `O` to enable Auto Drive and then `L` to enable the datalogger. _(I've already trained so many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you don't really need to aggregate a dataset to train your own)_
+Create a dataset using [/multicapturecli](/multicapturecli) _(I've already trained so many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you don't really need to aggregate a dataset to train your own)_
 
 - [`shuff.py`](shuff.py) - _(optional)_ shuffle the dataset & zeros any [NaN's](https://en.wikipedia.org/wiki/NaN).
 - [`train.py`](train.py) - train a model from the dataset `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
 - [`pred.py`](pred.py) - run the predictor daemon so that the `./porydrive` program can communicate with the Tensorflow Keras backend `python3 pred.py <model_path>`.
 
 Then run `./porydrive` and press `I` to enter Neural Drive mode.
+
+If you use a pre-trained model then you just need to start at the `pred.py` step.
+
+It is possible to train datasets using [/multicapturegui](/multicapturegui) or `./porydrive` _(press `O` to enable Auto Drive and then `L` to enable the datalogger)_ but these methods are now legacy and only suitable for smaller datasets. You could expect a 1GB dataset from these in the time [/multicapturecli](/multicapturecli) generated 500GB. [/multicapturecli](/multicapturecli) will generate a very small percentage of corruption in the dataset it produces such as NaN's and that is why it is important to use `shuff.py` before you train using a dataset from it, as where the other former methods are much less likely to produe datasets with corruption.
 
 ## info
 
