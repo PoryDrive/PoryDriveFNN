@@ -27,7 +27,7 @@ Generally FNN networks under 1024 `layer_units` will train faster on the CPU tha
 
 Trained models are kept in a seperate repository; [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models). Nesterov optimiser and tanh activation functions seem to work best for this purpose. An example of a small network trained with Nesterov would be `python3 train.py 4 384 32 nesterov 1` or `python3 train2.py 16 32 32 tanh nesterov 1`.
 
-A 1GB dataset to train a 4 layer network with 384-869 _(384 is my preferred)_ units per layer _(top-down so technically less as each layer reduces the units by a factor of two.)_ and batches set at 32 _(because the sample rate is 144 times per second that is roughly one batch per just less than one quater of a second of data. You could push this to 64 for faster training but I always find 32 batches produces a slightly better network)_ these networks are relatively fast to train, can be trained concurrently on multiple CPU's and are what I consider to be the "sweet spot". Trained with Nesterov accelerated gradient as mentioned above.
+A 1GB dataset to train a 4 layer network with 384-869 _(384 is my preferred)_ units per layer _(top-down so technically less as each layer reduces the units by a factor of two.)_ and batches set at 32 _(because the sample rate is 144 times per second that is roughly one batch per just less than one quater of a second of data. You could push this to 64 for faster training but I always find 32 batches produces a slightly better network)_ these networks are relatively fast to train, can be trained concurrently on multiple CPU's and are what I consider to be the "sweet spot".
 
 ## input
 
