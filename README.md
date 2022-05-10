@@ -7,6 +7,12 @@ This is forked from [mrbid/porydrive](https://github.com/mrbid/porydrive).
 
 Focused on using Tensorflow Keras on Linux. Training and gameplay has been set to ~144 updates per second, frame rate can be limited independently.
 
+## rational
+
+With the dataset generation I am trying to aggregate rounds into specific buckets of performance and this performance is dictated by an overal score expressed as a normal 0-1 floating point number. This score is created at the end of each round upon having collected a Porygon. The score is defined by five factors; the distance the porygon started from the car at the beginning of the round, the speed the porygon was moving, the speed the porygon was changing direction, the total length of time the round took, and the total amount of collisions that took place during the round.
+
+The hope is that by creaming off the top scored datasets that the minimum collisions per round for the highest distances from the porygon at the round start will be isolated and thus creating a dataset that is more likely to be able to infer _(or well avoid)_ the existance of the obstacles without actually explicitly being told about them in the training data.
+
 ## how
 
 Create a dataset using [/multicapturecli](/multicapturecli) _(I've already trained so many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you don't really need to aggregate a dataset to train your own)_.
