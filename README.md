@@ -13,7 +13,7 @@ With the dataset generation I am trying to aggregate rounds into specific bucket
 
 The hope is that by creaming off the top scored datasets that the minimum collisions per round for the highest distances from the porygon at the round start will be isolated and thus creating a dataset that is more likely to be able to infer _(or well avoid)_ the existance of the obstacles without the network actually explicitly being told about them in the training data.
 
-This is similar to training a neural network to predict financial markets, we are trying to predict the presence of something that is intangible to the predictor. With financial markets that is pivot points or trend changes in the price evaluation, and in PoryDrive it is the presence of collision objects. In a financial market we can try to infer these intangible factors from market data or the output of applying trading indicators to the market data and in PoryDrive we can infer collision objects from the amount of delay they caused in getting to the end goal and/or the actual collision count in getting to the end goal.
+This is similar to training a neural network to predict financial markets, we are trying to predict the presence of something that is intangible to the predictor. With financial markets that is pivot points or trend changes in the price evaluation, and in PoryDrive it is the presence of collision objects. In a financial market we can try to infer these intangible factors from market data or the output of applying trading indicators to the market data and in PoryDrive we can infer collision objects from the amount of delay that they caused in getting to the end goal and/or the actual collision count in getting to the end goal.
 
 ## how
 
