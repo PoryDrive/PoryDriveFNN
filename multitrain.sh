@@ -39,7 +39,9 @@
 xterm -e "python3 train.py 4 384 32 nesterov 1" &
 xterm -e "python3 train.py 4 869 32 nesterov 1" &
 
+xterm -e "python3 train2.py 8 16 32 tanh nesterov 1" &
 xterm -e "python3 train2.py 16 32 32 tanh nesterov 1" &
+xterm -e "python3 train2.py 32 64 32 tanh nesterov 1" &
 xterm -e "python3 train2.py 64 32 32 tanh nesterov 1" &
 
 # xterm -e "python3 train2.py 64 128 32 tanh nesterov 1" &
