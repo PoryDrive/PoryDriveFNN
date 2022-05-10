@@ -23,7 +23,7 @@ It is possible to train datasets using [/multicapturegui](/multicapturegui) or `
 
 ## info
 
-I have locked training and replaying neural models to the ScarletFast car physics configuration as this has more flexible handling.
+I have locked training and replaying of neural models to the ScarletFast car physics configuration as this has more flexible handling.
 
 Generally FNN networks under 1024 `layer_units` will train faster on the CPU than the GPU and vice-versa for networks of more than 1024 `layer_units`. Remove the `os.environ['CUDA_VISIBLE_DEVICES'] = '-1'` line (14) from [pred.py](pred.py) if you intend to use larger networks.
 
