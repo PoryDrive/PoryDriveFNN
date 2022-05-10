@@ -26,7 +26,7 @@ Then run `./porydrive` and press `I` to enter Neural Drive mode.
 If you use a pre-trained model then you just need to start at the `pred.py` step.
 
 <details>
- <summary>Alternate methods of generating datasets</summary>
+ <summary>*Alternate methods of generating datasets*</summary>
  
 It is possible to train datasets using [/multicapturegui](/multicapturegui) or `./porydrive` _(press `O` to enable Auto Drive and then `L` to enable the datalogger)_ but these methods are now legacy and only suitable for smaller datasets. You could expect a 1GB dataset from these in the time [/multicapturecli](/multicapturecli) generated 500GB. [/multicapturecli](/multicapturecli) will generate a very small percentage of corruption in the dataset it produces such as NaN's and that is why it is important to use [shuff.py](shuff.py) before you train using a dataset from it, as where the other former methods are much less likely to produce datasets with corruption.
 </details>
