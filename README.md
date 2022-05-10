@@ -11,7 +11,7 @@ Focused on using Tensorflow Keras on Linux. Training and gameplay has been set t
 
 Create a dataset using [/multicapturecli](/multicapturecli) _(I've already trained so many models in [PoryDriveFNN_models](https://github.com/PoryDrive/PoryDriveFNN_models) that you don't really need to aggregate a dataset to train your own)_.
 
-- [`shuff.py`](shuff.py) - _(optional)_ shuffle the dataset & zeros any [NaN's](https://en.wikipedia.org/wiki/NaN).
+- [`shuff.py`](shuff.py) - _(optional but recommended)_ shuffle the dataset & zeros any [NaN's](https://en.wikipedia.org/wiki/NaN).
 - [`train.py`](train.py) - train a model from the dataset `python3 train.py <layers 0-4> <units per layer> <batches> <optimiser: adam,nesterov,etc> <cpu only 1/0>`
 - [`pred.py`](pred.py) - run the predictor daemon so that the `./porydrive` program can communicate with the Tensorflow Keras backend `python3 pred.py <model_path>`.
 
