@@ -907,8 +907,9 @@ int main(int argc, char** argv)
     if(argc >= 2){mcp = atoi(argv[1]);}
     timeout = 0;
     if(argc >= 3){timeout = atof(argv[2]);}
-    minscore = 0.f;
+    minscore = 0.01f;
     if(argc >= 4){minscore = atof(argv[3]);}
+    if(minscore == 0.f){minscore = 0.01f;}
     printf("Running for %u rounds with a timeout of %g seconds.\n----\n", mcp, timeout);
 
     // i did consider threading this, and having a log buffer
