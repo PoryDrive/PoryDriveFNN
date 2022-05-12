@@ -1304,12 +1304,6 @@ void main_loop()
 
     // writing the targets to a seperate file makes file io errors more annoying to catch, but it does streamline
     // the process of loading that data into Keras.
-    
-    // dataset logging
-    //printf("%f %f %f %f\n", (vAngle(pbd)*-1.f)+d2PI, vAngle(lad)+d2PI, vDot(pbd, lad)+1.f, vDist(pp, zp));
-    //printf("%g %g %g %g :: %g\n", (vAngle(pbd)*-1.f)+d2PI, vAngle(lad)+d2PI, vDot(pbd, lad)+1.f, vDist(pp, zp), sr);
-    //printf("%g %g %g %g :: %g :: %f\n", vAngle(pbd), vAngle(lad), vDot(pbd, lad), vDist(pp, zp), sr, sp);
-    //printf("%g %g %g %g %g %g :: %g :: %f\n", pbd.x, pbd.y, lad.x, lad.y, vDot(pbd, lad), vDist(pp, zp), sr, sp);
 
 //*************************************
 // simulate car
