@@ -335,6 +335,7 @@ void writeWarning(const char* s)
         char strts[16];
         timestamp(&strts[0]);
         fprintf(f, "[%s] %s\n", strts, s);
+        printf("[%s] %s\n", strts, s);
         fclose(f);
     }
 }
@@ -811,10 +812,11 @@ void main_loop()
         if(round_score >= minscore && dxi > 0 && dyi > 0)
         {
             int eskip = 0;
+            char emsg[256];
 
-            char fnbx[256];
+            char fnbx[32];
             sprintf(fnbx, "%.1f_x.dat", round_score);
-            char fnby[256];
+            char fnby[32];
             sprintf(fnby, "%.1f_y.dat", round_score);
 
             int f = open(fnbx, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
@@ -826,22 +828,17 @@ void main_loop()
                 const size_t dxis = dxi*sizeof(f32);
                 const ssize_t wb = write(f, &dataset_x[0], dxis);
 
-                // this is very rare but if it fails... well.. we get a dirty file if it cant be fixed
+                // this is very rare but if it fails... well.. we have a log
                 if(wb != dxis)
                 {
-                    writeWarning("A file write error occured.");
-                    printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb*sizeof(f32));
-                    if(forceTrim(f, wb) < 0) // clear append to X dataset
+                    sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnbx, wb*sizeof(f32));
+                    writeWarning(emsg);
+                    if(forceTrim(f, wb) < 0) // revert append to X dataset
                     {
-                        printf("Failed to repair X file. Exiting.\n");
-                        writeWarning("Failed to repair X file write error.");
-                        char fnbx_dirty[512];
-                        sprintf(fnbx_dirty, "%s_dirty", fnbx);
-                        close(f);
-                        rename(fnbx, fnbx_dirty);
-                        exit(0);
+                        writeWarning("Failed to revert X file write error. Exiting.");
+                        exit(0); // locks, file handles, all cleaned automatically
                     }
-                    printf("Repaired.\n");
+                    writeWarning("Repaired.");
                     eskip = 1;
                 }
 
@@ -852,8 +849,7 @@ void main_loop()
             }
             else
             {
-                printf("Failed to open() X file. Skipping Y file.\n");
-                writeWarning("Failed to open Y file.");
+                writeWarning("Failed to open() X file. Skipping Y file.");
                 eskip = 1;
             }
 
@@ -868,32 +864,22 @@ void main_loop()
                     const size_t dyis = dyi*sizeof(f32);
                     const ssize_t wb = write(f, &dataset_y[0], dyis);
 
-                    // this is very rare but if it fails... well.. we get a dirty file if it cant be fixed
+                    // this is very rare but if it fails... well.. we have a log
                     if(wb != dyis)
                     {
-                        writeWarning("A file write error occured.");
-                        printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb*sizeof(f32));
-                        if(forceTrimLock(fnbx, 24) < 0) // clear append to X dataset
+                        sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnby, wb*sizeof(f32));
+                        writeWarning(emsg);
+                        if(forceTrimLock(fnbx, 24) < 0) // revert append to X dataset
                         {
-                            printf("Failed to repair X file. Exiting.\n");
-                            writeWarning("Failed to repair X file write error.");
-                            char fnbx_dirty[512];
-                            sprintf(fnbx_dirty, "%s_dirty", fnbx);
-                            close(f);
-                            rename(fnbx, fnbx_dirty);
-                            exit(0);
+                            writeWarning("Failed to revert X file write error. Exiting.");
+                            exit(0); // locks, file handles, all cleaned automatically
                         }
                         if(forceTrim(f, wb) < 0) // clear corrupted write to Y dataset
                         {
-                            printf("Failed to repair Y file. Exiting.\n");
-                            writeWarning("Failed to repair Y file write error.");
-                            char fnby_dirty[512];
-                            sprintf(fnby_dirty, "%s_dirty", fnby);
-                            close(f);
-                            rename(fnby, fnby_dirty);
-                            exit(0);
+                            writeWarning("Failed to revert Y file write error. Exiting.");
+                            exit(0); // locks, file handles, all cleaned automatically
                         }
-                        printf("Repaired.\n");
+                        writeWarning("Repaired.");
                     }
 
                     if(flock(f, LOCK_UN) == -1)
@@ -903,15 +889,11 @@ void main_loop()
                 }
                 else
                 {
+                    // failed to open Y dataset for append so lets revert the last append to X dataset
                     writeWarning("Failed to open Y file.");
-                    // failed to open Y dataset for append so lets the last append to X dataset
                     if(forceTrimLock(fnbx, 24) < 0)
                     {
-                        printf("Failed to repair X file after Y file open failed. Exiting.\n");
-                        writeWarning("Failed to repair X file write error after dataset Y file open failed.");
-                        char fnbx_dirty[512];
-                        sprintf(fnbx_dirty, "%s_dirty", fnbx);
-                        rename(fnbx, fnbx_dirty);
+                        writeWarning("Failed to revert X file after Y file open failed. Exiting.");
                         exit(0);
                     }
                 }
