@@ -970,8 +970,8 @@ int main(int argc, char** argv)
 
     // i did consider threading this, and having a log buffer
     // per thread that got aggregated by a logging thread
-    // but it was just easier to multi-process it
-    // and it's adequate. I've not witnessed the file locking
+    // but it was just easier to multi-process it and it's
+    // adequate. I've not witnessed the file locking
     // cause any impact on the CPS assumably because the
     // writes are staggered by variable round times.
 
