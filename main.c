@@ -1189,8 +1189,6 @@ void main_loop()
     }
     
     // neural net dataset
-    // input | output
-    // body direction x&y, porygon direction x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
     if(dataset_logger == 1)
     {
         vec lad = pp;
