@@ -818,22 +818,23 @@ void main_loop()
             char fnby[32];
             sprintf(fnby, "%.1f_y.dat", round_score);
 
-            int f = open(fnbx, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
-            if(f > -1)
+            // open and lock the X file and don't unlock until Y is also written to
+            int fx = open(fnbx, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
+            if(fx > -1)
             {
-                if(flock(f, LOCK_EX) == -1)
+                // lock X
+                if(flock(fx, LOCK_EX) == -1)
                     usleep(1000);
 
+                // append to X file
                 const size_t dxis = dxi*sizeof(f32);
-                const ssize_t wb = write(f, &dataset_x[0], dxis);
-
-                // this is very rare but if it fails... well.. we have a log
-                if(wb != dxis)
+                const ssize_t wb = write(fx, &dataset_x[0], dxis);
+                if(wb != dxis) // this is very rare but if it fails... well.. we have a log
                 {
                     char emsg[256];
                     sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnbx, wb);
                     writeWarning(emsg);
-                    if(forceTrim(f, wb) < 0) // revert append to X dataset
+                    if(forceTrim(fx, wb) < 0) // revert append to X dataset
                     {
                         writeWarning("Failed to revert X file write error. Exiting.");
                         exit(0); // locks, file handles, all cleaned automatically
@@ -842,40 +843,24 @@ void main_loop()
                     eskip = 1;
                 }
 
-                if(flock(f, LOCK_UN) == -1)
-                    usleep(1000);
-
-                close(f);
-            }
-            else
-            {
-                writeWarning("Failed to open X file. Skipping Y file.");
-                eskip = 1;
-            }
-
-            if(eskip == 0)
-            {
-                f = open(fnby, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
-                if(f > -1)
+                // open Y file but we don't need to lock it as the X file lock is governing both
+                int fy = open(fnby, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
+                if(fy > -1)
                 {
-                    if(flock(f, LOCK_EX) == -1)
-                        usleep(1000);
-
+                    // append to Y file
                     const size_t dyis = dyi*sizeof(f32);
-                    const ssize_t wb = write(f, &dataset_y[0], dyis);
-
-                    // this is very rare but if it fails... well.. we have a log
-                    if(wb != dyis)
+                    const ssize_t wb = write(fy, &dataset_y[0], dyis);
+                    if(wb != dyis) // this is very rare but if it fails... well.. we have a log
                     {
                         char emsg[256];
                         sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnby, wb);
                         writeWarning(emsg);
-                        if(forceTrimLock(fnbx, 24) < 0) // revert append to X dataset
+                        if(forceTrim(fx, 24) < 0) // revert append to X dataset
                         {
                             writeWarning("Failed to revert X file write error. Exiting.");
                             exit(0); // locks, file handles, all cleaned automatically
                         }
-                        if(forceTrim(f, wb) < 0) // clear corrupted write to Y dataset
+                        if(forceTrim(fy, wb) < 0) // clear corrupted write to Y dataset
                         {
                             writeWarning("Failed to revert Y file write error. Exiting.");
                             exit(0); // locks, file handles, all cleaned automatically
@@ -883,21 +868,26 @@ void main_loop()
                         writeWarning("Repaired.");
                     }
 
-                    if(flock(f, LOCK_UN) == -1)
-                        usleep(1000);
-
-                    close(f);
+                    // close Y
+                    close(fy);
                 }
                 else
                 {
                     // failed to open Y dataset for append so lets revert the last append to X dataset
                     writeWarning("Failed to open Y file.");
-                    if(forceTrimLock(fnbx, 24) < 0)
+                    if(forceTrim(fx, 24) < 0)
                     {
                         writeWarning("Failed to revert X file after Y file open failed. Exiting.");
                         exit(0);
                     }
                 }
+
+                // unlock X
+                if(flock(fx, LOCK_UN) == -1)
+                    usleep(1000);
+
+                // close X
+                close(fx);
             }
 
             dxi = 0, dyi = 0;
