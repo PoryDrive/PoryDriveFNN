@@ -327,6 +327,18 @@ int forceTrimLock(const char* file, const size_t trim)
     return 0;
 }
 
+void writeWarning()
+{
+    FILE* f = fopen("WARNING_FLAGGED_ERROR.TXT", "a"); // just make it long so that it is noticable
+    if(f != NULL)
+    {
+        char strts[16];
+        timestamp(&strts[0]);
+        fprintf(f, "[%s] A failed write occured.", strts);
+        fclose(f);
+    }
+}
+
 //*************************************
 // render functions
 //*************************************
@@ -805,18 +817,20 @@ void main_loop()
             char fnby[256];
             sprintf(fnby, "%.1f_y.dat", round_score);
 
-            FILE* f = fopen(fnbx, "ab"); // append bytes
-            if(f != NULL)
+            int f = open(fnbx, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU); // append bytes
+            if(f > -1)
             {
-                const int fno = fileno(f);
-                if(flock(fno, LOCK_EX) == -1)
+                if(flock(f, LOCK_EX) == -1)
                     usleep(1000);
 
-                const size_t wb = fwrite(&dataset_x[0], sizeof(f32), dxi, f);
-                if(wb != dxi)
+                const size_t dxis = dxi*sizeof(f32);
+                const ssize_t wb = write(f, &dataset_x[0], dxis);
+                if(wb != dxis)
                 {
+                    writeWarning(); // just flag that something potentially not good has happened.
+                    // this is very rare but if it happens... well.. we get a dirty file if it cant be fixed
                     printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb*sizeof(f32));
-                    if(forceTrim(fno, wb*sizeof(f32)) < 0)
+                    if(forceTrim(f, wb*sizeof(f32)) < 0) // clear append to X dataset
                     {
                         printf("Failed to repair X file. Exiting.\n");
                         char fnbx_dirty[512];
@@ -828,28 +842,38 @@ void main_loop()
                     eskip = 1;
                 }
 
-                if(flock(fno, LOCK_UN) == -1)
+                if(flock(f, LOCK_UN) == -1)
                     usleep(1000);
 
-                fclose(f);
+                close(f);
             }
 
             if(eskip == 0)
             {
-                f = fopen(fnby, "ab"); // append bytes
-                if(f != NULL)
+                f = open(fnby, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU); // append bytes
+                if(f > -1)
                 {
-                    const int fno = fileno(f);
-                    if(flock(fno, LOCK_EX) == -1)
+                    if(flock(f, LOCK_EX) == -1)
                         usleep(1000);
 
-                    const size_t wb = fwrite(&dataset_y[0], sizeof(f32), dyi, f);
-                    if(wb != dyi)
+                    const size_t dyis = dyi*sizeof(f32);
+                    const ssize_t wb = write(f, &dataset_y[0], dyis);
+                    if(wb != dyis)
                     {
+                        writeWarning(); // just flag that something potentially not good has happened.
+                        // this is very rare but if it happens... well.. we get a dirty file if it cant be fixed
                         printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb*sizeof(f32));
-                        if(forceTrim(fno, wb*sizeof(f32)) < 0)
+                        if(forceTrimLock(fnbx, 24) < 0) // clear append to X dataset
                         {
                             printf("Failed to repair X file. Exiting.\n");
+                            char fnbx_dirty[512];
+                            sprintf(fnbx_dirty, "%s_dirty", fnbx);
+                            rename(fnbx, fnbx_dirty);
+                            exit(0);
+                        }
+                        if(forceTrim(f, wb*sizeof(f32)) < 0) // clear corrupted write to Y dataset
+                        {
+                            printf("Failed to repair Y file. Exiting.\n");
                             char fnby_dirty[512];
                             sprintf(fnby_dirty, "%s_dirty", fnby);
                             rename(fnby, fnby_dirty);
@@ -858,13 +882,14 @@ void main_loop()
                         printf("Repaired.\n");
                     }
 
-                    if(flock(fno, LOCK_UN) == -1)
+                    if(flock(f, LOCK_UN) == -1)
                         usleep(1000);
 
-                    fclose(f);
+                    close(f);
                 }
                 else
                 {
+                    // failed to open Y dataset for append so lets the last append to X dataset
                     if(forceTrimLock(fnbx, 24) < 0)
                     {
                         printf("Failed to repair X file. Exiting.\n");
