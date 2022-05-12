@@ -825,12 +825,13 @@ void main_loop()
 
                 const size_t dxis = dxi*sizeof(f32);
                 const ssize_t wb = write(f, &dataset_x[0], dxis);
+
+                // this is very rare but if it fails... well.. we get a dirty file if it cant be fixed
                 if(wb != dxis)
                 {
                     writeWarning("A file write error occured.");
-                    // this is very rare but if it happens... well.. we get a dirty file if it cant be fixed
                     printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb*sizeof(f32));
-                    if(forceTrim(f, wb*sizeof(f32)) < 0) // clear append to X dataset
+                    if(forceTrim(f, wb) < 0) // clear append to X dataset
                     {
                         printf("Failed to repair X file. Exiting.\n");
                         writeWarning("Failed to repair X file write error.");
@@ -866,10 +867,11 @@ void main_loop()
 
                     const size_t dyis = dyi*sizeof(f32);
                     const ssize_t wb = write(f, &dataset_y[0], dyis);
+
+                    // this is very rare but if it fails... well.. we get a dirty file if it cant be fixed
                     if(wb != dyis)
                     {
                         writeWarning("A file write error occured.");
-                        // this is very rare but if it happens... well.. we get a dirty file if it cant be fixed
                         printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb*sizeof(f32));
                         if(forceTrimLock(fnbx, 24) < 0) // clear append to X dataset
                         {
@@ -881,7 +883,7 @@ void main_loop()
                             rename(fnbx, fnbx_dirty);
                             exit(0);
                         }
-                        if(forceTrim(f, wb*sizeof(f32)) < 0) // clear corrupted write to Y dataset
+                        if(forceTrim(f, wb) < 0) // clear corrupted write to Y dataset
                         {
                             printf("Failed to repair Y file. Exiting.\n");
                             writeWarning("Failed to repair Y file write error.");
