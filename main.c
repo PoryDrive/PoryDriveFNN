@@ -504,9 +504,11 @@ __attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // C co
 
 void iterBody()
 {
+    // maybe change this a little bit for the body, otherwise its a duplicate function that
+    // could just be simplified down to one.
     static const uint mi = body_numvert*3;
     static f32 cd = 1.f;
-    for(uint i = 0; i < mi; i++) // lavalamp it
+    for(uint i = 0; i < mi; i++)
     {
         body_colors2[i] += fRandFloat(0.1f, 0.6f) * cd;
         if(body_colors2[i] >= 1.f)
