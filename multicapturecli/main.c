@@ -817,7 +817,7 @@ void main_loop()
             char fnby[256];
             sprintf(fnby, "%.1f_y.dat", round_score);
 
-            int f = open(fnbx, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU); // append bytes
+            int f = open(fnbx, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
             if(f > -1)
             {
                 if(flock(f, LOCK_EX) == -1)
@@ -858,7 +858,7 @@ void main_loop()
 
             if(eskip == 0)
             {
-                f = open(fnby, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU); // append bytes
+                f = open(fnby, O_APPEND | O_CREAT | O_WRONLY, S_IRWXU);
                 if(f > -1)
                 {
                     if(flock(f, LOCK_EX) == -1)
