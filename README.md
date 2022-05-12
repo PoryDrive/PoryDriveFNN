@@ -106,18 +106,19 @@ steeringspeed 1.2
 steerinertia 233
 minsteer 0.32
 maxsteer 0.55
-steering_deadzone = 0.013
+steering_deadzone 0.013
 steeringtransfer 0.023
 steeringtransferinertia 280
-suspension_pitch = 3
-suspension_pitch_limit = 0.03
-suspension_roll = 30
-suspension_roll_limit = 9
+suspension_pitch 3
+suspension_pitch_limit 0.03
+suspension_roll 30
+suspension_roll_limit 9
+sticky_collisions 0
 
-ad_min_dstep = 0.01
-ad_max_dstep = 0.06
-ad_min_speedswitch = 2
-ad_maxspeed_reductor = 0.5
+ad_min_dstep 0.01
+ad_max_dstep 0.06
+ad_min_speedswitch 2
+ad_maxspeed_reductor 0.5
 ```
 #### car physics variables
 - `maxspeed` - top travel speed of car.
@@ -135,6 +136,7 @@ ad_maxspeed_reductor = 0.5
 - `suspension_pitch_limit` - max & min pitch limit
 - `suspension_roll` - suspension roll increment scalar
 - `suspension_roll_limit` - max & min roll limit
+- `sticky_collisions` - 0 = bouncy collisions, 1 = sticky collisions
 
 #### auto drive variables
 - `ad_min_dstep` - minimum delta-distance from the porygon that can trigger a change in steering direction. The delta-distance is the amount of change in the distance since the last update.
