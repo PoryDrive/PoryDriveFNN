@@ -204,6 +204,7 @@ f32 suspension_pitch = 3.f;
 f32 suspension_pitch_limit = 0.03f;
 f32 suspension_roll = 30.f;
 f32 suspension_roll_limit = 9.f;
+uint sticky_collisions = 0;
 
 char cname[256] = {0};
 
@@ -260,6 +261,7 @@ void loadConfig(uint type)
                 if(strcmp(set, "suspension_pitch_limit") == 0){suspension_pitch_limit = val;}
                 if(strcmp(set, "suspension_roll") == 0){suspension_roll = val;}
                 if(strcmp(set, "suspension_roll_limit") == 0){suspension_roll_limit = val;}
+                if(strcmp(set, "sticky_collisions") == 0){sticky_collisions = (uint)val;}
 
                 // auto drive
                 if(strcmp(set, "ad_min_dstep") == 0){ad_min_dstep = val;}
@@ -608,6 +610,7 @@ void rCube(f32 x, f32 y)
             vNorm(&nf);
             vMulS(&nf, nf, 0.097f-dla1);
             vAdd(&pv, pv, nf);
+            if(sticky_collisions){sp *= 0.5f;}
         }
         else if(dla0 <= 0.097f)
         {
@@ -616,6 +619,7 @@ void rCube(f32 x, f32 y)
             vNorm(&nf);
             vMulS(&nf, nf, 0.097f-dla0);
             vAdd(&pv, pv, nf);
+            if(sticky_collisions){sp *= 0.5f;}
         }
         else if(dla2 <= 0.097f)
         {
@@ -624,6 +628,7 @@ void rCube(f32 x, f32 y)
             vNorm(&nf);
             vMulS(&nf, nf, 0.097f-dla2);
             vAdd(&pv, pv, nf);
+            if(sticky_collisions){sp *= 0.5f;}
         }
     }
 
