@@ -812,7 +812,6 @@ void main_loop()
         if(round_score >= minscore && dxi > 0 && dyi > 0)
         {
             int eskip = 0;
-            char emsg[256];
 
             char fnbx[32];
             sprintf(fnbx, "%.1f_x.dat", round_score);
@@ -831,6 +830,7 @@ void main_loop()
                 // this is very rare but if it fails... well.. we have a log
                 if(wb != dxis)
                 {
+                    char emsg[256];
                     sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnbx, wb*sizeof(f32));
                     writeWarning(emsg);
                     if(forceTrim(f, wb) < 0) // revert append to X dataset
@@ -867,6 +867,7 @@ void main_loop()
                     // this is very rare but if it fails... well.. we have a log
                     if(wb != dyis)
                     {
+                        char emsg[256];
                         sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnby, wb*sizeof(f32));
                         writeWarning(emsg);
                         if(forceTrimLock(fnbx, 24) < 0) // revert append to X dataset
