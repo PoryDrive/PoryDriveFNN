@@ -288,7 +288,7 @@ double glfwGetTime()
     return ((double)tv.tv_sec) + (((double)tv.tv_usec)/1000000.0);
 }
 
-int forceTrim(int f, const size_t trim)
+int forceTrim(const int f, const size_t trim)
 {
     if(f > -1)
     {
