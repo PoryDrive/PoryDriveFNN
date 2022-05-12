@@ -849,7 +849,7 @@ void main_loop()
             }
             else
             {
-                writeWarning("Failed to open() X file. Skipping Y file.");
+                writeWarning("Failed to open X file. Skipping Y file.");
                 eskip = 1;
             }
 
