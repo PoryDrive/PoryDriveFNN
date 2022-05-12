@@ -831,7 +831,7 @@ void main_loop()
                 if(wb != dxis)
                 {
                     char emsg[256];
-                    sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnbx, wb*sizeof(f32));
+                    sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnbx, wb);
                     writeWarning(emsg);
                     if(forceTrim(f, wb) < 0) // revert append to X dataset
                     {
@@ -868,7 +868,7 @@ void main_loop()
                     if(wb != dyis)
                     {
                         char emsg[256];
-                        sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnby, wb*sizeof(f32));
+                        sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnby, wb);
                         writeWarning(emsg);
                         if(forceTrimLock(fnbx, 24) < 0) // revert append to X dataset
                         {
