@@ -335,6 +335,8 @@ void configOriginal()
     suspension_roll = 30.f;
     suspension_roll_limit = 9.f;
 
+    sticky_collisions = 1;
+
     char strts[16];
     timestamp(&strts[0]);
     sprintf(cname, "Original");
@@ -359,6 +361,8 @@ void configScarlet()
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
     suspension_roll_limit = 9.f;
+
+    sticky_collisions = 0;
     
     char strts[16];
     timestamp(&strts[0]);
@@ -384,6 +388,8 @@ void configScarletFast()
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
     suspension_roll_limit = 9.f;
+
+    sticky_collisions = 0;
     
     char strts[16];
     timestamp(&strts[0]);
@@ -409,6 +415,8 @@ void configHybrid()
     suspension_pitch_limit = 0.03f;
     suspension_roll = 30.f;
     suspension_roll_limit = 9.f;
+
+    sticky_collisions = 0;
     
     char strts[16];
     timestamp(&strts[0]);
