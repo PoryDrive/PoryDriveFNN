@@ -504,18 +504,11 @@ __attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // C co
 
 void iterBody()
 {
-    // so that you don't get confused I am exploiting the
-    // fact that when a colour channel goes into minus
-    // figures very strange things begin to happen to the
-    // gradient between triangle verticies.
     static const uint mi = body_numvert*3;
     static f32 cd = 1.f;
     for(uint i = 0; i < mi; i++) // lavalamp it
     {
         body_colors2[i] += fRandFloat(0.1f, 0.6f) * cd;
-
-        // and this piece of code prevents it looking like a random mess,
-        // gives some structure. This is the lava lamper.
         if(body_colors2[i] >= 1.f)
             cd = -1.f;
         else if(body_colors2[i] <= 0.f)
