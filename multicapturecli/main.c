@@ -849,6 +849,12 @@ void main_loop()
 
                 close(f);
             }
+            else
+            {
+                printf("Failed to open() X file. Skipping Y file.\n");
+                writeWarning("Failed to open Y file.");
+                eskip = 1;
+            }
 
             if(eskip == 0)
             {
@@ -895,11 +901,11 @@ void main_loop()
                 }
                 else
                 {
-                    writeWarning("A file open error occured on dataset Y.");
+                    writeWarning("Failed to open Y file.");
                     // failed to open Y dataset for append so lets the last append to X dataset
                     if(forceTrimLock(fnbx, 24) < 0)
                     {
-                        printf("Failed to repair X file. Exiting.\n");
+                        printf("Failed to repair X file after Y file open failed. Exiting.\n");
                         writeWarning("Failed to repair X file write error after dataset Y file open failed.");
                         char fnbx_dirty[512];
                         sprintf(fnbx_dirty, "%s_dirty", fnbx);

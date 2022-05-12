@@ -1235,6 +1235,7 @@ void main_loop()
                 if(forceTrim("dataset_x.dat", r) < 0)
                 {
                     printf("Failed to repair X file. Exiting.\n");
+                    fclose(f);
                     rename("dataset_x.dat", "dataset_x.dat_dirty");
                     exit(0);
                 }
@@ -1270,6 +1271,7 @@ void main_loop()
                     if(forceTrim("dataset_x.dat", 24) < 0) // targets for this data failed to write, so wipe that too
                     {
                         printf("Failed to revert X file. Exiting.\n");
+                        fclose(f);
                         rename("dataset_x.dat", "dataset_x.dat_dirty");
                         rename("dataset_y.dat", "dataset_y.dat_dirty");
                         exit(0);
@@ -1277,6 +1279,7 @@ void main_loop()
                     if(forceTrim("dataset_y.dat", r) < 0)
                     {
                         printf("Failed to repair Y file. Exiting.\n");
+                        fclose(f);
                         rename("dataset_x.dat", "dataset_x.dat_dirty");
                         rename("dataset_y.dat", "dataset_y.dat_dirty");
                         exit(0);
