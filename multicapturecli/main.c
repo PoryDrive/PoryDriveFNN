@@ -288,7 +288,20 @@ double glfwGetTime()
     return ((double)tv.tv_sec) + (((double)tv.tv_usec)/1000000.0);
 }
 
-int forceTrim(const char* file, const size_t trim)
+int forceTrim(int f, const size_t trim)
+{
+    if(f > -1)
+    {
+        const size_t len = lseek(f, 0, SEEK_END);
+        if(ftruncate(f, len-trim) == -1)
+            return -1;
+    }
+    else
+        return -1;
+    return 0;
+}
+
+int forceTrimLock(const char* file, const size_t trim)
 {
     int f = open(file, O_WRONLY);
     if(f > -1)
@@ -795,14 +808,15 @@ void main_loop()
             FILE* f = fopen(fnbx, "ab"); // append bytes
             if(f != NULL)
             {
-                if(flock(fileno(f), LOCK_EX) == -1)
+                const int fno = fileno(f);
+                if(flock(fno, LOCK_EX) == -1)
                     usleep(1000);
 
                 const size_t wb = fwrite(&dataset_x[0], sizeof(f32), dxi, f);
                 if(wb != dxi)
                 {
                     printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnbx, wb*sizeof(f32));
-                    if(forceTrim(fnbx, wb*sizeof(f32)) < 0)
+                    if(forceTrim(fno, wb*sizeof(f32)) < 0)
                     {
                         printf("Failed to repair X file. Exiting.\n");
                         char fnbx_dirty[512];
@@ -814,7 +828,7 @@ void main_loop()
                     eskip = 1;
                 }
 
-                if(flock(fileno(f), LOCK_UN) == -1)
+                if(flock(fno, LOCK_UN) == -1)
                     usleep(1000);
 
                 fclose(f);
@@ -825,14 +839,15 @@ void main_loop()
                 f = fopen(fnby, "ab"); // append bytes
                 if(f != NULL)
                 {
-                    if(flock(fileno(f), LOCK_EX) == -1)
+                    const int fno = fileno(f);
+                    if(flock(fno, LOCK_EX) == -1)
                         usleep(1000);
 
                     const size_t wb = fwrite(&dataset_y[0], sizeof(f32), dyi, f);
                     if(wb != dyi)
                     {
                         printf("Outch, just wrote corrupted bytes to %s! (last %zu bytes).\n", fnby, wb*sizeof(f32));
-                        if(forceTrim(fnby, wb*sizeof(f32)) < 0)
+                        if(forceTrim(fno, wb*sizeof(f32)) < 0)
                         {
                             printf("Failed to repair X file. Exiting.\n");
                             char fnby_dirty[512];
@@ -843,14 +858,14 @@ void main_loop()
                         printf("Repaired.\n");
                     }
 
-                    if(flock(fileno(f), LOCK_UN) == -1)
+                    if(flock(fno, LOCK_UN) == -1)
                         usleep(1000);
 
                     fclose(f);
                 }
                 else
                 {
-                    if(forceTrim(fnbx, 24) < 0)
+                    if(forceTrimLock(fnbx, 24) < 0)
                     {
                         printf("Failed to repair X file. Exiting.\n");
                         char fnbx_dirty[512];
