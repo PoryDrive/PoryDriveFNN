@@ -288,39 +288,15 @@ double glfwGetTime()
     return ((double)tv.tv_sec) + (((double)tv.tv_usec)/1000000.0);
 }
 
-int forceTrim(const int f, const size_t trim)
+int trimFile(const int f, const off_t trim)
 {
     if(f > -1)
     {
-        const size_t len = lseek(f, 0, SEEK_END);
+        const off_t len = lseek(f, 0, SEEK_END);
+        if(len == -1)
+            return -1;
         if(ftruncate(f, len-trim) == -1)
             return -1;
-    }
-    else
-        return -1;
-    return 0;
-}
-
-int forceTrimLock(const char* file, const size_t trim)
-{
-    int f = open(file, O_WRONLY);
-    if(f > -1)
-    {
-        while(flock(f, LOCK_EX) == -1)
-            usleep(1000);
-
-        const size_t len = lseek(f, 0, SEEK_END);
-
-        if(ftruncate(f, len-trim) == -1)
-        {
-            close(f);
-            return -1;
-        }
-
-        while(flock(f, LOCK_UN) == -1)
-            usleep(1000);
-
-        close(f);
     }
     else
         return -1;
@@ -823,7 +799,7 @@ void main_loop()
             if(fx > -1)
             {
                 // lock X
-                if(flock(fx, LOCK_EX) == -1)
+                if(flock(fx, LOCK_EX) == -1) // very rare that these would hang forever unless there is some serious hard drive failure.
                     usleep(1000);
 
                 // append to X file
@@ -834,7 +810,7 @@ void main_loop()
                     char emsg[256];
                     sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnbx, wb);
                     writeWarning(emsg);
-                    if(forceTrim(fx, wb) < 0) // revert append to X dataset
+                    if(trimFile(fx, wb) < 0) // revert append to X dataset
                     {
                         writeWarning("Failed to revert X file write error. Exiting.");
                         exit(0); // locks, file handles, all cleaned automatically
@@ -855,12 +831,12 @@ void main_loop()
                         char emsg[256];
                         sprintf(emsg, "Just wrote corrupted bytes to %s! (last %zu bytes).", fnby, wb);
                         writeWarning(emsg);
-                        if(forceTrim(fx, 24) < 0) // revert append to X dataset
+                        if(trimFile(fx, 24) < 0) // revert append to X dataset
                         {
                             writeWarning("Failed to revert X file write error. Exiting.");
                             exit(0); // locks, file handles, all cleaned automatically
                         }
-                        if(forceTrim(fy, wb) < 0) // clear corrupted write to Y dataset
+                        if(trimFile(fy, wb) < 0) // clear corrupted write to Y dataset
                         {
                             writeWarning("Failed to revert Y file write error. Exiting.");
                             exit(0); // locks, file handles, all cleaned automatically
@@ -875,7 +851,7 @@ void main_loop()
                 {
                     // failed to open Y dataset for append so lets revert the last append to X dataset
                     writeWarning("Failed to open Y file.");
-                    if(forceTrim(fx, 24) < 0)
+                    if(trimFile(fx, 24) < 0)
                     {
                         writeWarning("Failed to revert X file after Y file open failed. Exiting.");
                         exit(0);
