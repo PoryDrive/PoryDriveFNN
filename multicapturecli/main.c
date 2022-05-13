@@ -135,11 +135,23 @@ f32 maxsteer = 0.45f;
 f32 steeringtransfer = 0.019f;
 f32 steeringtransferinertia = 280.f;
 
-char cname[256] = {0};
-
 //*************************************
 // utility functions
 //*************************************
+void setConfig()
+{
+    maxspeed = 0.0165f;
+    acceleration = 0.0028f;
+    inertia = 0.00022f;
+    drag = 0.00038f;
+    steeringspeed = 1.4f;
+    steerinertia = 180.f;
+    minsteer = 0.16f;
+    maxsteer = 0.3f;
+    steeringtransfer = 0.023f;
+    steeringtransferinertia = 280.f;
+}
+
 void timestamp(char* ts)
 {
     const time_t tt = time(0);
@@ -177,82 +189,6 @@ void timeTaken(uint ss)
         else if(tt < 12960000.0)
             sprintf(tts, "%.2f Days", tt * 0.00000463);
     }
-}
-
-void configOriginal()
-{
-    maxspeed = 0.006f;
-    acceleration = 0.001f;
-    inertia = 0.0001f;
-    drag = 0.00038f;
-    steeringspeed = 1.2f;
-    steerinertia = 233.f;
-    minsteer = 0.1f;
-    maxsteer = 0.7f;
-    steeringtransfer = 0.023f;
-    steeringtransferinertia = 280.f;
-
-    char strts[16];
-    timestamp(&strts[0]);
-    sprintf(cname, "Original");
-    printf("[%s] CONFIG: %s.\n", strts, cname);
-}
-
-void configScarlet()
-{
-    maxspeed = 0.0095f;
-    acceleration = 0.0025f;
-    inertia = 0.00015f;
-    drag = 0.00038f;
-    steeringspeed = 1.2f;
-    steerinertia = 233.f;
-    minsteer = 0.32f;
-    maxsteer = 0.55f;
-    steeringtransfer = 0.023f;
-    steeringtransferinertia = 280.f;
-    
-    char strts[16];
-    timestamp(&strts[0]);
-    sprintf(cname, "Scarlet");
-    printf("[%s] CONFIG: %s.\n", strts, cname);
-}
-
-void configScarletFast()
-{
-    maxspeed = 0.0165f;
-    acceleration = 0.0028f;
-    inertia = 0.00022f;
-    drag = 0.00038f;
-    steeringspeed = 1.4f;
-    steerinertia = 180.f;
-    minsteer = 0.16f;
-    maxsteer = 0.3f;
-    steeringtransfer = 0.023f;
-    steeringtransferinertia = 280.f;
-    
-    char strts[16];
-    timestamp(&strts[0]);
-    sprintf(cname, "ScarletFast");
-    printf("[%s] CONFIG: %s.\n", strts, cname);
-}
-
-void configHybrid()
-{
-    maxspeed = 0.0165f;
-    acceleration = 0.0028f;
-    inertia = 0.00022f;
-    drag = 0.00038f;
-    steeringspeed = 3.2f;
-    steerinertia = 233.f;
-    minsteer = 0.1f;
-    maxsteer = 0.2f;
-    steeringtransfer = 0.023f;
-    steeringtransferinertia = 280.f;
-    
-    char strts[16];
-    timestamp(&strts[0]);
-    sprintf(cname, "Hybrid");
-    printf("[%s] CONFIG: %s.\n", strts, cname);
 }
 
 float urandf()
@@ -332,9 +268,6 @@ void rCube(f32 x, f32 y)
         vMulS(&nf, nf, 0.15f-dlap);
         vAdd(&zp, zp, nf);
     }
-
-    //printf("pp: %f %f - %f\n", pp.x, pp.y, t);
-    //printf("pv: %f %f - %f\n", pv.x, pv.y, t);
 
     // if car is moving compute collisions
     if(sp > inertia || sp < -inertia)
@@ -523,7 +456,7 @@ void main_loop()
     //     timeTaken(1);
     //     char title[256];
     //     const f32 dsp = fabsf(sp*(1.f/maxspeed)*130.f);
-    //     printf("| %s | Speed %.f MPH | Porygon %u | %s\n", tts, dsp, cp, cname);
+    //     printf("| %s | Speed %.f MPH | Porygon %u\n", tts, dsp, cp);
     //     ltut = t + 1.0;
     // }
 
@@ -875,7 +808,7 @@ void main_loop()
     // the process of loading that data into Keras.
 
 //*************************************
-// main render
+// main render (this is just for simulation now)
 //*************************************
 
     // render scene
@@ -930,7 +863,7 @@ int main(int argc, char** argv)
 
     // init
     t = glfwGetTime();
-    configScarletFast();
+    setConfig();
     randGame();
 
     // reset
