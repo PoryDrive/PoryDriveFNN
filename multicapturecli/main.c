@@ -131,8 +131,8 @@ f32 drag = 0.00038f;
 f32 steeringspeed = 1.4f;
 f32 steerinertia = 180.f;
 f32 minsteer = 0.16f;
-f32 maxsteer = 0.45f;
-f32 steeringtransfer = 0.019f;
+f32 maxsteer = 0.3f;
+f32 steeringtransfer = 0.023f;
 f32 steeringtransferinertia = 280.f;
 
 //*************************************
