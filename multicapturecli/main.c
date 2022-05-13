@@ -833,7 +833,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("PoryDriveCli_scored\n");
     printf("James William Fletcher (james@voxdsp.com)\n");
-    printf("This is the CLI trainer. No GFX. CPU Bound.\n");
+    printf("This is the CLI trainer. No GFX. CPU Bound. Multi-process with file locking.\n");
     printf("----\n");
 
 //*************************************
