@@ -293,7 +293,7 @@ void timeTaken(uint ss)
     {
         const double tt = t-st;
         if(tt < 60.0)
-            sprintf(tts, "%.2f Sec", tt);
+            sprintf(tts, "%.0f Sec", tt);
         else if(tt < 3600.0)
             sprintf(tts, "%.2f Min", tt * 0.016666667);
         else if(tt < 216000.0)
@@ -305,7 +305,7 @@ void timeTaken(uint ss)
     {
         const double tt = t-st;
         if(tt < 60.0)
-            sprintf(tts, "%.2f Seconds", tt);
+            sprintf(tts, "%.0f Seconds", tt);
         else if(tt < 3600.0)
             sprintf(tts, "%.2f Minutes", tt * 0.016666667);
         else if(tt < 216000.0)
