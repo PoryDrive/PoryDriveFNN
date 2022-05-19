@@ -127,7 +127,6 @@ mat projection;
 mat view;
 mat model;
 mat modelview;
-mat viewrot;
 
 // render state inputs
 vec lightpos = {0.f, 0.f, 0.f};
@@ -149,6 +148,8 @@ ESModel mdlWheel;
 #define FAR_DISTANCE 1000.f
 #define NEWGAME_SEED 1337
 uint RENDER_PASS = 0;
+double st=0; // start time
+char tts[32];// time taken string
 
 // camera vars
 uint focus_cursor = 1;
@@ -167,8 +168,6 @@ vec pbd;// body direction
 f32 sp; // speed
 uint cp;// collected porygon count
 uint cc;// collision count
-double st=0; // start time
-char tts[32];// time taken string
 f32 pc = 0.f;// is player colliding
 
 // ai/ml
@@ -455,6 +454,13 @@ uint64_t microtime()
     memset(&tz, 0, sizeof(struct timezone));
     gettimeofday(&tv, &tz);
     return 1000000 * tv.tv_sec + tv.tv_usec;
+}
+
+static inline uint isnorm(const f32 f)
+{
+    if(isnormal(f) == 1 || f == 0.f)
+        return 1;
+    return 0;
 }
 
 int forceTrim(const char* file, const size_t trim)
@@ -966,8 +972,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 
 void newGame(unsigned int seed)
 {
-    srand(urand());
-    srandf(urand());
+    srand(seed);
+    srandf(seed);
 
     char strts[16];
     timestamp(&strts[0]);
@@ -1004,7 +1010,7 @@ void randAutoDrive()
 
 void randGame()
 {
-    const uint seed = urand();
+    const int seed = urand();
     newGame(seed);
 
     zp = (vec){uRandFloat(-18.f, 18.f), uRandFloat(-18.f, 18.f), 0.f};
@@ -1022,13 +1028,6 @@ void randGame()
     char strts[16];
     timestamp(&strts[0]);
     printf("\n[%s] Rand Game Start [%u], DATASET LOGGER & AUTO DRIVE ON.\n", strts, seed);
-}
-
-static inline uint isnorm(const f32 f)
-{
-    if(isnormal(f) == 1 || f == 0.f)
-        return 1;
-    return 0;
 }
 
 //*************************************
@@ -1464,7 +1463,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             printf("[%s] Time-Taken: %s or %g Seconds\n\n", strts, tts, t-st);
             
             // new
-            newGame(time(0));
+            newGame(urand());
         }
 
         else if(key == GLFW_KEY_R)
@@ -1672,7 +1671,8 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("James William Fletcher (james@voxdsp.com)\n");
     printf("----\n");
-    printf("There is only one command line argument, and that is the MSAA level 0-16.\n");
+    printf("Three command line arguments, msaa 0-16, maxfps, data logging mode 0-1.\n");
+    printf("e.g; ./porydrive 16 144 0\n");
     printf("----\n");
     printf("~ Keyboard Input:\n");
     printf("ESCAPE = Focus/Unfocus Mouse Look\n");
@@ -1712,13 +1712,14 @@ int main(int argc, char** argv)
     printf("----\n");
 
     // init glfw
-    if(!glfwInit()){exit(EXIT_FAILURE);}
+    if(!glfwInit()){printf("glfwInit() failed.\n"); exit(EXIT_FAILURE);}
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_SAMPLES, msaa);
     window = glfwCreateWindow(winw, winh, "PoryDrive", NULL, NULL);
     if(!window)
     {
+        printf("glfwCreateWindow() failed.\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }

@@ -71,14 +71,12 @@ f32 dt = 0;   // delta time
 double timeout = 0; // timeout after
 
 // render state matrices
-mat projection;
-mat view;
 mat model;
-mat modelview;
-mat viewrot;
 
 // game vars
 #define NEWGAME_SEED 1337
+double st=0; // start time
+char tts[32];// time taken string
 
 // player vars
 f32 pr; // rotation
@@ -91,8 +89,6 @@ f32 sp; // speed
 uint mcp;// max collected porygon count
 uint cp;// collected porygon count
 uint cc;// collision count
-double st=0; // start time
-char tts[32];// time taken string
 
 // ai/ml
 uint auto_drive=0;
@@ -382,8 +378,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 
 void newGame(unsigned int seed)
 {
-    srand(urand());
-    srandf(urand());
+    srand(seed);
+    srandf(seed);
     
     pp = (vec){0.f, 0.f, 0.f};
     pv = (vec){0.f, 0.f, 0.f};
@@ -414,7 +410,7 @@ void randAutoDrive()
 
 void randGame()
 {
-    const uint seed = urand();
+    const int seed = urand();
     newGame(seed);
 
     zp = (vec){uRandFloat(-18.f, 18.f), uRandFloat(-18.f, 18.f), 0.f};
