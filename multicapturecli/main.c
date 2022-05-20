@@ -716,8 +716,6 @@ void main_loop()
         // write log buffer to file
         if(round_score >= minscore && dxi > 0 && dyi > 0)
         {
-            int eskip = 0;
-
             char fnbx[32];
             sprintf(fnbx, "%.1f_x.dat", round_score);
             char fnby[32];
@@ -745,7 +743,6 @@ void main_loop()
                         exit(0); // locks, file handles, all cleaned automatically
                     }
                     writeWarning("Repaired.");
-                    eskip = 1;
                 }
 
                 // open Y file but we don't need to lock it as the X file lock is governing both
