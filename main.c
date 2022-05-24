@@ -456,19 +456,11 @@ uint64_t microtime()
     return 1000000 * tv.tv_sec + tv.tv_usec;
 }
 
-static inline uint isnorm(const f32 f)
-{
-    if(isnormal(f) == 1 || f == 0.f)
-        return 1;
-    return 0;
-}
-// because our isnorm() function allows 0 we need to zero nans because some nans will qualify as equal to zero
-static inline f32 zeroNaN(const f32 f)
-{
-    if(f == 0.f){return 0.f;}
-    return f;
-}
-// or we could just not allow zeros but and use the plain isnormal() but I want to allow zeros in this case
+#define isnorm isnormal
+// static inline uint isnorm(const f32 f)
+// {
+//     return isnormal(f);
+// }
 
 int forceTrim(const char* file, const size_t trim)
 {
@@ -1181,8 +1173,8 @@ void main_loop()
                 if(isnorm(ret[0]) == 1 && isnorm(ret[1]) == 1)
                 {
                     // set new vars
-                    sr = zeroNaN(ret[0]);
-                    sp = zeroNaN(ret[1]);
+                    sr = ret[0];
+                    sp = ret[1];
                 }
 
                 // printf("%f %f\n", sp, sr);
