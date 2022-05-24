@@ -437,6 +437,13 @@ static inline uint isnorm(const f32 f)
         return 1;
     return 0;
 }
+// because our isnorm() function allows 0 we need to zero nans because some nans will qualify as equal to zero
+static inline f32 zeroNaN(const f32 f)
+{
+    if(f == 0.f){return 0.f;}
+    return f;
+}
+// or we could just not allow zeros but and use the plain isnormal() but I want to allow zeros in this case
 
 //*************************************
 // update & render
@@ -528,8 +535,8 @@ void main_loop()
     //             if(isnorm(ret[0]) == 1 && isnorm(ret[1]) == 1)
     //             {
     //                 // set new vars
-    //                 sr = ret[0];
-    //                 sp = ret[1];
+    //                 sr = zeroNaN(ret[0]);
+    //                 sp = zeroNaN(ret[1]);
     //             }
     //         }
     //         fclose(f);
@@ -701,16 +708,16 @@ void main_loop()
         if(fail == 0)
         {
             // log x
-            dataset_x[dxi++] = pbd.x;
-            dataset_x[dxi++] = pbd.y;
-            dataset_x[dxi++] = lad.x;
-            dataset_x[dxi++] = lad.y;
-            dataset_x[dxi++] = angle;
-            dataset_x[dxi++] = dist;
+            dataset_x[dxi++] = zeroNaN(pbd.x);
+            dataset_x[dxi++] = zeroNaN(pbd.y);
+            dataset_x[dxi++] = zeroNaN(lad.x);
+            dataset_x[dxi++] = zeroNaN(lad.y);
+            dataset_x[dxi++] = zeroNaN(angle);
+            dataset_x[dxi++] = zeroNaN(dist);
 
             // log y
-            dataset_y[dyi++] = sr;
-            dataset_y[dyi++] = sp;
+            dataset_y[dyi++] = zeroNaN(sr);
+            dataset_y[dyi++] = zeroNaN(sp);
         }
 
         // write log buffer to file

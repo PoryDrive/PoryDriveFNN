@@ -462,6 +462,13 @@ static inline uint isnorm(const f32 f)
         return 1;
     return 0;
 }
+// because our isnorm() function allows 0 we need to zero nans because some nans will qualify as equal to zero
+static inline f32 zeroNaN(const f32 f)
+{
+    if(f == 0.f){return 0.f;}
+    return f;
+}
+// or we could just not allow zeros but and use the plain isnormal() but I want to allow zeros in this case
 
 int forceTrim(const char* file, const size_t trim)
 {
@@ -1169,14 +1176,16 @@ void main_loop()
                 // if(ret[0] > 1.f){ret[0] = 1.f;}
                 // if(ret[1] < -1.f){ret[1] = -1.f;}
                 // if(ret[1] > 1.f){ret[1] = 1.f;}
-                //printf("%f %f %u %u\n", ret[0], ret[1], isnormal(ret[0]), isnormal(ret[1]));
+                // printf("%f %f %u %u\n", ret[0], ret[1], isnorm(ret[0]), isnorm(ret[1]));
 
                 if(isnorm(ret[0]) == 1 && isnorm(ret[1]) == 1)
                 {
                     // set new vars
-                    sr = ret[0];
-                    sp = ret[1];
+                    sr = zeroNaN(ret[0]);
+                    sp = zeroNaN(ret[1]);
                 }
+
+                // printf("%f %f\n", sp, sr);
             }
             fclose(f);
         }
