@@ -121,8 +121,13 @@ model = Sequential()
 # model.add(Dense(layer_units, activation=activator, input_dim=inputsize))
 
 # model.add(SimpleRNN((layer_units), batch_input_shape=(None,inputsize,1)))
+<<<<<<< HEAD
 # model.add(LSTM( (layer_units), batch_input_shape=(None,inputsize,1) )) #, recurrent_dropout=.3))
 model.add(GRU((layer_units), batch_input_shape=(None,inputsize,1)))
+=======
+model.add(LSTM( (layer_units), batch_input_shape=(None,inputsize,1) )) #, recurrent_dropout=.3))
+# model.add(GRU((layer_units), batch_input_shape=(None,inputsize,1)))
+>>>>>>> a709563e401a5ee256cb764cde245a0694adc729
 
 for x in range(layers):
     # model.add(Dropout(.3))
