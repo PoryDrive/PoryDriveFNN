@@ -51,7 +51,7 @@ A 1GB dataset to train a 4 layer network with 384-869 _(384 is my preferred)_ un
 - (car_pos - porygon_pos) normal dir x
 - (car_pos - porygon_pos) normal dir y
 - angle between both normal dir's _(Dot product)_
-- Euclidean distance between car and porygon
+- euclidean distance between car and porygon
 
 #### Training data targets
 - car steering angle
