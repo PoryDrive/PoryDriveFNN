@@ -1670,7 +1670,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("PoryDrive\n");
     printf("----\n");
-    printf("James William Fletcher (james@voxdsp.com)\n");
+    printf("James William Fletcher (github.com/mrbid)\n");
     printf("----\n");
     printf("Three command line arguments, msaa 0-16, maxfps, data logging mode 0-1.\n");
     printf("e.g; ./porydrive 16 144 0\n");
