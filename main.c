@@ -1,5 +1,5 @@
 /*
-    James William Fletcher (github.com/mrbid)
+    James William Fletcher (james@voxdsp.com)
         April 2022
 
     Info:
@@ -425,17 +425,17 @@ void configHybrid()
 
 float urandf()
 {
-    static const float FLOAT_UINT64_MAX = (float)UINT64_MAX;
+    static const float FLOAT_UINT64_MAX = 1.f/(float)UINT64_MAX;
     int f = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
     uint64_t s = 0;
     ssize_t result = read(f, &s, sizeof(uint64_t));
     close(f);
-    return (((float)s)+1e-7f) / FLOAT_UINT64_MAX;
+    return ((float)s) * FLOAT_UINT64_MAX;
 }
 
 float uRandFloat(const float min, const float max)
 {
-    return ( urandf() * (max-min) ) + min;
+    return urandf() * (max-min) + min;
 }
 
 uint64_t urand()
@@ -558,7 +558,6 @@ void rCube(f32 x, f32 y)
 
         glUniform1f(opacity_id, 1.0f);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
         
         if(bindstate != 1)
@@ -726,9 +725,7 @@ void rPorygon(f32 x, f32 y, f32 r)
         else
             glUniform1f(opacity_id, 1.0f);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-
         modelBind(&mdlPorygon);
 
         if(za != 0.0)
@@ -764,12 +761,9 @@ void rDNA(f32 x, f32 y, f32 z)
         mMul(&modelview, &model, &view);
 
         glUniform1f(opacity_id, 1.0f);
-
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
-        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
         
+        glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
         modelBind(&mdlDNA);
-
         glDrawElements(GL_TRIANGLES, dna_numind, GL_UNSIGNED_SHORT, 0);
     }
 }
@@ -803,11 +797,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mRotY(&model, -wr);
         mMul(&modelview, &model, &view);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-        
         modelBind(&mdlWheel);
-
         glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
         // wheel; back left
@@ -819,11 +810,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mRotY(&model, -wr);
         mMul(&modelview, &model, &view);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-        
         modelBind(&mdlWheel);
-
         glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
         // wheel; front right
@@ -837,11 +825,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mRotY(&model, wr);
         mMul(&modelview, &model, &view);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-        
         modelBind(&mdlWheel);
-
         glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
         // wheel; back right
@@ -854,11 +839,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mRotY(&model, wr);
         mMul(&modelview, &model, &view);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-        
         modelBind(&mdlWheel);
-
         glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
         // body & window matrix
@@ -881,7 +863,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
         mRotX(&model, sx);
         mMul(&modelview, &model, &view);
 
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
         glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
         
         // body
@@ -1670,7 +1651,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("PoryDrive\n");
     printf("----\n");
-    printf("James William Fletcher (github.com/mrbid)\n");
+    printf("James William Fletcher (james@voxdsp.com)\n");
     printf("----\n");
     printf("Three command line arguments, msaa 0-16, maxfps, data logging mode 0-1.\n");
     printf("e.g; ./porydrive 16 144 0\n");
@@ -1811,6 +1792,7 @@ int main(int argc, char** argv)
     glClearColor(0.13, 0.13, 0.13, 0.0);
 
     shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
 
 //*************************************
