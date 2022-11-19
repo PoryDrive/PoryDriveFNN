@@ -22,7 +22,7 @@
         A = Turn Left
         S = Drive Backward
         D = Turn Right
-        Space = Breaks
+        Space = Brakes
         1-5 = Car Physics config selection (5 loads from file)
 
 
@@ -1667,7 +1667,7 @@ int main(int argc, char** argv)
     printf("A = Turn Left\n");
     printf("S = Drive Backward\n");
     printf("D = Turn Right\n");
-    printf("Space = Break\n");
+    printf("Space = Brake\n");
     printf("1-5 = Car Physics config selection (5 loads from file)\n");
     printf("L = Toggle dataset logging\n");
     printf("----\n");
