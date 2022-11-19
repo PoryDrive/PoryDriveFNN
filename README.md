@@ -154,7 +154,7 @@ Drive around and "collect" Porygon, each time a Porygon is collected a new one w
  - `A` = Turn Left
  - `S` = Drive Backward
  - `D` = Turn Right
- - `Space` = Breaks
+ - `Space` = Brakes
  - `1-5` = Car Physics config selection _(5 loads from file)_
 
 #### keyboard dev
