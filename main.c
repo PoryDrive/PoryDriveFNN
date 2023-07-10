@@ -144,7 +144,7 @@ ESModel mdlWindows;
 ESModel mdlWheel;
 
 // game vars
-#define FAR_DISTANCE 1000.f
+#define FAR_DISTANCE 30.f
 #define NEWGAME_SEED 1337
 uint RENDER_PASS = 0;
 double st=0; // start time
@@ -1629,7 +1629,8 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     uh2 = 1 / wh2;
 
     mIdent(&projection);
-    mPerspective(&projection, 60.0f, aspect, 0.01f, FAR_DISTANCE*2.f); 
+    mPerspective(&projection, 60.0f, aspect, 0.01f, FAR_DISTANCE);
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*)&projection.m[0][0])
 }
 
 //*************************************
