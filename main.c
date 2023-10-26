@@ -1684,16 +1684,26 @@ int main(int argc, char** argv)
     printf("~ Create custom car physics:\n");
     printf("It is possible to tweak the car physics by creating a config.txt file in the exec/working directory of the game, here is an example of such config file with the default car phsyics variables.\n");
     printf("~ config.txt:\n");
-    printf("maxspeed 0.0095\n");
-    printf("acceleration 0.0025\n");
-    printf("inertia 0.00015\n");
+    printf("maxspeed 0.0265\n");
+    printf("acceleration 0.0028\n");
+    printf("inertia 0.0022\n");
     printf("drag 0.00038\n");
-    printf("steeringspeed 1.2\n");
-    printf("steerinertia 233\n");
-    printf("minsteer 0.32\n");
-    printf("maxsteer 0.55\n");
+    printf("steeringspeed 0.04\n");
+    printf("steerinertia 180\n");
+    printf("minsteer 0.3\n");
+    printf("maxsteer 0.36\n");
+    printf("steering_deadzone 0.033\n");
     printf("steeringtransfer 0.023\n");
     printf("steeringtransferinertia 280\n");
+    printf("suspension_pitch 3\n");
+    printf("suspension_pitch_limit 0.06\n");
+    printf("suspension_roll 30\n");
+    printf("suspension_roll_limit 100\n");
+    printf("sticky_collisions 0\n");
+    printf("ad_min_dstep 0.01\n");
+    printf("ad_max_dstep 0.06\n");
+    printf("ad_min_speedswitch 2\n");
+    printf("ad_maxspeed_reductor 0.5\n");
     printf("----\n");
 
     // init glfw
